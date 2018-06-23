@@ -1,33 +1,28 @@
-const { Map, List } = require('immutable')
+const { Map } = require('immutable')
 
 class Cards {
-  constructor() {
+  static cards = () =>
 
-    this.cards = Map({
-      ra:  Map({name: "roman abdication",        early: true, event: true,  side: "ussr",    ops: 1}),  
-      ir:  Map({name: "independent reds",        early: true, event: true,  side: "ussr",    ops: 2}), 
-      og:  Map({name: "olympic games",           early: true, event: true,  side: "neutral", ops: 2}), 
-      as:  Map({name: "asia scoring",            early: true, event: false, side: "neutral",           scoringcard: true}),
-      rsp: Map({name: "redscare / purge",        early: true, event: false, side: "neutral", ops: 4}),
-      br:  Map({name: "brush war",               mid:   true, event: false, side: "neutral", ops: 2}), 
-      sea: Map({name: "southeast asia scoring",  mid:   true, event: false, side: "neutral",           scoringcard: true}),
-      wb:  Map({name: "willy brandt",            mid:   true, event: true,  side: "ussr",    ops: 2}), 
-      dc:  Map({name: "duck and cover",          early: true, event: false, side: "us",      ops: 3}), 
-      ys:  Map({name: "yuri & samantha",         late:  true, event: true,  side: "ussr",    ops: 2}), 
+    Map({
+      ra:  Map({key: 'ra', name: "roman abdication",        early: true, event: true,  side: "ussr",    ops: 1}),  
+      ir:  Map({key: 'ir', name: "independent reds",        early: true, event: true,  side: "ussr",    ops: 2}), 
+      og:  Map({key: 'og', name: "olympic games",           early: true, event: true,  side: "neutral", ops: 2}), 
+      as:  Map({key: 'as', name: "asia scoring",            early: true, event: false, side: "neutral",           scoringcard: true}),
+      rsp: Map({key: 'rsp', name: "redscare / purge",        early: true, event: false, side: "neutral", ops: 4}),
+      br:  Map({key: 'br', name: "brush war",               mid:   true, event: false, side: "neutral", ops: 2}), 
+      sea: Map({key: 'sea', name: "southeast asia scoring",  mid:   true, event: false, side: "neutral",           scoringcard: true}),
+      wb:  Map({key: 'wb', name: "willy brandt",            mid:   true, event: true,  side: "ussr",    ops: 2}), 
+      dc:  Map({key: 'dc', name: "duck and cover",          early: true, event: false, side: "us",      ops: 3}), 
+      ys:  Map({key: 'ys', name: "yuri & samantha",         late:  true, event: true,  side: "ussr",    ops: 2}), 
     })
 
-    // console.log(this.cards.filter(x => { console.log(x.toJS()); return true}).toJS())
 
-    this.ussr().mapKeys((k,v) => console.log(k))
-  }
+  static earlywar = (cards) => cards.filter(c => c.get('early'))
+  static midwar = (cards) => cards.filter(c => c.get('mid'))
+  static latewar = (cards) => cards.filter(c => c.get('late'))
 
-
-  earlywar = () => this.cards.filter(c => c.get('early'))
-  midwar = () => this.cards.filter(c => c.get('mid'))
-  latewar = () => this.cards.filter(c => c.get('late'))
-
-  ussr = () => this.cards.filter(c => c.get('side') === 'ussr')
-  us = () => this.cards.filter(c => c.get('side') === 'us')
+  static ussr = (cards) => cards.filter(c => c.get('side') === 'ussr')
+  static us = (cards) => cards.filter(c => c.get('side') === 'us')
 
 }
 export default Cards
