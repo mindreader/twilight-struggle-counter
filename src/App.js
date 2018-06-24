@@ -101,10 +101,10 @@ class App extends Component {
       cardStates: allCards.map(c =>
         Map({presence: "deck"})
       ),
-      viewBy: 'war', // war / ops value / importance
-      sortBy: 'ops', // ops / name / importance
+      viewBy: 'importance', // war / ops value / importance
+      sortBy: 'importance', // ops / name / importance
       filterBy: 'none', // none / scoring / 2ops / 3ops / 4ops / high priority
-      phase: 1, // 1 = early, 2 = mid, 3 = late
+      phase: 3, // 1 = early, 2 = mid, 3 = late
       lastState: null,
     })}
   }
@@ -117,7 +117,7 @@ class App extends Component {
       highpriority: "2ops", "2ops": "3ops", "3ops": "4ops", "4ops": "none"}
     this.views = {war: "ops", ops: "importance", importance: "war"}
 
-    this.allCards = Cards.cards()
+    this.allCards = Cards.cardsWithImportance()
 
     this.cardClicked = this.cardClicked.bind(this)
 
@@ -130,7 +130,8 @@ class App extends Component {
         case 'none': return 0
         case 'ops': return c.get('ops') ? (5 - c.get('ops')) : 0
         case 'name': return c.get('name')
-        case 'importance': return 0 // TODO
+        case 'importance': return 100 - (10 * c.get('importance')) + (c.get('ops') ? (5 - c.get('ops')) : 0) // TODO this formula looks wrong to me
+
         default: return c.get('name')
       }
     }).filter(c => {
@@ -139,7 +140,7 @@ class App extends Component {
         case '2ops': return c.get('ops') >= 2
         case '3ops': return c.get('ops') >= 3
         case '4ops': return c.get('ops') >= 4
-        case 'highpriority': return true
+        case 'highpriority': return c.get('importance') > 6
         default: return true
       }
     }).filter(c =>
@@ -196,6 +197,17 @@ class App extends Component {
   }
 
   renderByImportance() {
+    const cards = this.cards().map(c =>
+      <Card key={c.get('key')} id={c.get('key')} side={c.get('side')} ops={c.get('ops')} name={c.get('name')} presence={this.state.data.getIn(['cardStates',c.get('key'), 'presence'])} onClick={this.cardClicked}/>
+    ).toList()
+    return (
+      <div>
+          <div>
+            <ul>
+              {cards}
+            </ul>
+          </div>
+      </div>)
   }
 
   render() {
