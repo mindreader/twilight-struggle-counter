@@ -31,43 +31,17 @@ class Card extends Component {
 
 class App extends Component {
 
-  shuffleOccurs = () => {
-  }
+  changePhase = () => this.setState(({data}) =>
+    ({data: data.update('phase', p => p < 3 ? p + 1 : 1).set('lastState', data)}))
 
-  changePhase = () => 
-    this.setState(({data}) => {
-      return {data: data.update('phase', p => p < 3 ? p + 1 : 1).set('lastState', data)}
-    })
+  changeSort = () => this.setState(({data}) =>
+    ({data: data.update('sortBy', sb => this.sorts[sb])}))
 
-  changeSort = () =>
-    this.setState(({data}) => {
-      return {data: data.update('sortBy', sb => {
-        switch (sb) {
-          case "ops": return "name"
-          case "name": return "importance"
-          case "importance": return "ops"
-          default: return "ops"
-        }
-      })}
-    })
+  changeFilter = () => this.setState(({data}) =>
+    ({data: data.update('filterBy', fb => this.filters[fb])}))
 
-  // sorts = ['ops', 'name', 'importance']
-
-  changeFilter = () =>
-    this.setState(({data}) => {
-      return {data: data.update('filterBy', fb => {
-        switch (fb) {
-          case "none":         return "scoring"
-          case "scoring":      return "highpriority"
-          case "highpriority": return "2ops"
-          case "2ops":         return "3ops"
-          case "3ops":         return "4ops"
-          case "4ops":         return "none"
-          default:             return "none"
-        }
-      })}
-    })
-
+  changeView = () => this.setState(({data}) =>
+    ({data: data.update('viewBy', vb => this.views[vb])}))
 
   reset = () => this.setState(() => App.initialState(this.allCards))
 
@@ -81,18 +55,6 @@ class App extends Component {
       }
     })
 
-
-  dealRest = () => {
-  }
-
-  // TODO hide in late war
-  nextPhase = () => {
-    switch (this.state.data.get('phase')) {
-      case 1: return "ADD MIDWAR"
-      case 2: return "ADD LATE WAR"
-      default: return "TODO"
-    }
-  }
 
   addDiscards() {
     this.setState(({data}) => {
@@ -123,6 +85,17 @@ class App extends Component {
     })
   }
 
+  // TODO hide in late war
+  nextPhaseLabel = () => {
+    switch (this.state.data.get('phase')) {
+      case 1: return "ADD MIDWAR"
+      case 2: return "ADD LATE WAR"
+      default: return "TODO"
+    }
+  }
+
+
+
   static initialState = (allCards) => {
     return {data: Map({
       cardStates: allCards.map(c =>
@@ -139,9 +112,14 @@ class App extends Component {
   constructor(props) {
     super(props)
 
-    this.cardClicked = this.cardClicked.bind(this)
+    this.sorts = {ops: 'name', name: 'importance', importance: 'ops'}
+    this.filters = {none: "scoring", scoring: "highpriority",
+      highpriority: "2ops", "2ops": "3ops", "3ops": "4ops", "4ops": "none"}
+    this.views = {war: "ops", ops: "importance", importance: "war"}
 
     this.allCards = Cards.cards()
+
+    this.cardClicked = this.cardClicked.bind(this)
 
     this.state = App.initialState(this.allCards)
   }
@@ -176,9 +154,9 @@ class App extends Component {
       <Card key={c.get('key')} id={c.get('key')} side={c.get('side')} ops={c.get('ops')} name={c.get('name')} presence={this.state.data.getIn(['cardStates',c.get('key'), 'presence'])} onClick={this.cardClicked}/>
     ).toList()
 
-    let mid = this.phase() < 2 ? [] : this.cards().filter(c => c.get('mid')).map(c => {
-      return <Card key={c.get('key')} id={c.get('key')} side={c.get('side')} ops={c.get('ops')} name={c.get('name')} presence={this.state.data.getIn(['cardStates',c.get('key'), 'presence'])} onClick={this.cardClicked}/>
-    }).toList()
+    let mid = this.phase() < 2 ? [] : this.cards().filter(c => c.get('mid')).map(c =>
+      <Card key={c.get('key')} id={c.get('key')} side={c.get('side')} ops={c.get('ops')} name={c.get('name')} presence={this.state.data.getIn(['cardStates',c.get('key'), 'presence'])} onClick={this.cardClicked}/>
+    ).toList()
 
     let late = this.phase() < 3 ? [] : this.cards().filter(c => c.get('late')).map(c =>
       <Card key={c.get('key')} id={c.get('key')} side={c.get('side')} ops={c.get('ops')} name={c.get('name')} presence={this.state.data.getIn(['cardStates',c.get('key'), 'presence'])} onClick={this.cardClicked}/>
@@ -227,7 +205,7 @@ class App extends Component {
     return (
       <div className="App">
         <button onClick={() => this.addDiscards()}>ADD DISCARDS</button>
-        <button onClick={() => this.changePhase()}>{this.nextPhase()}</button>
+        <button onClick={() => this.changePhase()}>{this.nextPhaseLabel()}</button>
         <button onClick={() => this.reset()}>RESET</button>
         <button onClick={() => this.undo()}>UNDO</button>
         <button onClick={() => this.changeView()}>viewed by {this.state.data.get('viewBy')}</button>
