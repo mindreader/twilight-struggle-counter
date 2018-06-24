@@ -82,6 +82,7 @@ class Cards {
       afs:  Map({name: "african scoring",         mid:  true, event: false,  side: "neutral",    scoringcard: true}),
       one:  Map({name: "one small step",         mid:  true, event: false,  side: "neutral",    ops: 2}),
       sas:  Map({name: "south america scoring",         mid:  true, event: false,  side: "neutral",    scoringcard: true}),
+      ihc:  Map({name: "iranian hostage crisis",         late:  true, event: true,  side: "ussr", ops: 3}),
     })
 
   static cardsWithImportance = () =>
