@@ -113,6 +113,7 @@ class App extends Component {
     super(props)
 
     this.sorts = {ops: 'name', name: 'importance', importance: 'ops'}
+    // TODO filter by affects region
     this.filters = {none: "scoring", scoring: "highpriority",
       highpriority: "2ops", "2ops": "3ops", "3ops": "4ops", "4ops": "none"}
     this.views = {war: "ops", ops: "importance", importance: "war"}
@@ -153,8 +154,8 @@ class App extends Component {
   renderByWar() {
 
     const cards = this.cards()
-    const f = (cfilter) => cards.filter(cfilter).map(c =>
-      <Card key={c.get('key')} id={c.get('key')} side={c.get('side')} ops={c.get('ops')} name={c.get('name')} presence={this.state.data.getIn(['cardStates',c.get('key'), 'presence'])} onClick={this.cardClicked}/>
+    const f = (cfilter) => cards.filter(cfilter).map((c, k) =>
+      <Card key={k} id={k} side={c.get('side')} ops={c.get('ops')} name={c.get('name')} presence={this.state.data.getIn(['cardStates',k, 'presence'])} onClick={this.cardClicked}/>
     ).toList()
 
     let early = f(c => c.get('early'))
@@ -183,8 +184,8 @@ class App extends Component {
   }
 
   renderByOps() {
-    const cards = this.cards().map(c =>
-      <Card key={c.get('key')} id={c.get('key')} side={c.get('side')} ops={c.get('ops')} name={c.get('name')} presence={this.state.data.getIn(['cardStates',c.get('key'), 'presence'])} onClick={this.cardClicked}/>
+    const cards = this.cards().map((c,k) =>
+      <Card key={k} id={k} side={c.get('side')} ops={c.get('ops')} name={c.get('name')} presence={this.state.data.getIn(['cardStates',k, 'presence'])} onClick={this.cardClicked}/>
     ).toList()
     return (
       <div>
@@ -197,8 +198,8 @@ class App extends Component {
   }
 
   renderByImportance() {
-    const cards = this.cards().map(c =>
-      <Card key={c.get('key')} id={c.get('key')} side={c.get('side')} ops={c.get('ops')} name={c.get('name')} presence={this.state.data.getIn(['cardStates',c.get('key'), 'presence'])} onClick={this.cardClicked}/>
+    const cards = this.cards().map((c,k) =>
+      <Card key={k} id={k} side={c.get('side')} ops={c.get('ops')} name={c.get('name')} presence={this.state.data.getIn(['cardStates',k, 'presence'])} onClick={this.cardClicked}/>
     ).toList()
     return (
       <div>
