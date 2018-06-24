@@ -128,7 +128,7 @@ class App extends Component {
     return this.allCards.sortBy(c => {
       switch (this.state.data.get('sortBy')) {
         case 'none': return 0
-        case 'ops': return c.get('ops') ? c.get('ops') : 0
+        case 'ops': return c.get('ops') ? (5 - c.get('ops')) : 0
         case 'name': return c.get('name')
         case 'importance': return 0 // TODO
         default: return c.get('name')
@@ -178,10 +178,21 @@ class App extends Component {
           </ul>
         </div>
       </div>
-    );
+    )
   }
 
   renderByOps() {
+    const cards = this.cards().map(c =>
+      <Card key={c.get('key')} id={c.get('key')} side={c.get('side')} ops={c.get('ops')} name={c.get('name')} presence={this.state.data.getIn(['cardStates',c.get('key'), 'presence'])} onClick={this.cardClicked}/>
+    ).toList()
+    return (
+      <div>
+          <div>
+            <ul>
+              {cards}
+            </ul>
+          </div>
+      </div>)
   }
 
   renderByImportance() {
