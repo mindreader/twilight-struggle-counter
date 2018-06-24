@@ -8,9 +8,9 @@ const { Map } = require('immutable')
 class Card extends Component {
   color() {
     switch (this.props.presence) {
-      case "deck": return "black"
+      case "inhand": return "black"
       case "discarded": return "gray"
-      case "inhand": return (this.props.side === "ussr") ? "red" : (this.props.side === "us" ? "blue" : "purple")
+      case "deck": return (this.props.side === "ussr") ? "red" : (this.props.side === "us" ? "blue" : "purple")
       case "removed": return "black"
       default: return "black"
     }
@@ -101,7 +101,7 @@ class App extends Component {
       cardStates: allCards.map(c =>
         Map({presence: "deck"})
       ),
-      viewBy: 'importance', // war / ops value / importance
+      viewBy: 'byside', // war / ops value / importance / byside
       sortBy: 'importance', // ops / name / importance
       filterBy: 'none', // none / scoring / 2ops / 3ops / 4ops / high priority
       phase: 3, // 1 = early, 2 = mid, 3 = late
@@ -222,18 +222,18 @@ class App extends Component {
     let ussr = f(c => c.get('side') === "ussr")
 
    return (
-      <div>
-        <div>
+      <div className="byside">
+        <div className="left">
           <ul>
             {us}
           </ul>
         </div>
-        <div>
+        <div className="middle">
           <ul>
             {neutral}
           </ul>
         </div>
-        <div>
+        <div className="right">
           <ul>
             {ussr}
           </ul>
