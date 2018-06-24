@@ -8,7 +8,7 @@ class Cards {
       mes:  Map({name: "middle east scoring",            early: true, event: false, side: "neutral",           scoringcard: true}),
       sea: Map({key: 'sea', name: "southeast asia scoring", mid:   true, event: true,  side: "neutral",           scoringcard: true}),
       ra:  Map({name: "roman abdication",        early: true, event: true,  side: "ussr",    ops: 1}),
-      ir:  Map({name: "independent reds",        early: true, event: true,  side: "ussr",    ops: 2})
+      ir:  Map({name: "independent reds",        early: true, event: true,  side: "ussr",    ops: 2}),
       og:  Map({name: "olympic games",           early: true, event: true,  side: "neutral", ops: 2}),
       rsp: Map({key: 'rsp', name: "redscare / purge",       early: true, event: false, side: "neutral", ops: 4}),
       br:  Map({name: "brush war",               mid:   true, event: false, side: "neutral", ops: 2}),

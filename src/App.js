@@ -116,7 +116,7 @@ class App extends Component {
     // TODO filter by affects region
     this.filters = {none: "scoring", scoring: "highpriority",
       highpriority: "2ops", "2ops": "3ops", "3ops": "4ops", "4ops": "none"}
-    this.views = {war: "ops", ops: "importance", importance: "war"}
+    this.views = {war: "ops", ops: "importance", importance: "byside", byside: "war"}
 
     this.allCards = Cards.cardsWithImportance()
 
@@ -211,6 +211,38 @@ class App extends Component {
       </div>)
   }
 
+  renderBySide() {
+    const cards = this.cards()
+    const f = (cfilter) => cards.filter(cfilter).map((c, k) =>
+      <Card key={k} id={k} side={c.get('side')} ops={c.get('ops')} name={c.get('name')} presence={this.state.data.getIn(['cardStates',k, 'presence'])} onClick={this.cardClicked}/>
+    ).toList()
+
+    let us = f(c => c.get('side') === "us")
+    let neutral = f(c => c.get('side') === "neutral")
+    let ussr = f(c => c.get('side') === "ussr")
+
+   return (
+      <div>
+        <div>
+          <ul>
+            {us}
+          </ul>
+        </div>
+        <div>
+          <ul>
+            {neutral}
+          </ul>
+        </div>
+        <div>
+          <ul>
+            {ussr}
+          </ul>
+        </div>
+      </div>
+    )
+
+  }
+
   render() {
     let content = null
     switch (this.state.data.get('viewBy')) {
@@ -219,6 +251,8 @@ class App extends Component {
       case 'ops':        content = this.renderByOps()
         break;
       case 'importance': content = this.renderByImportance()
+        break;
+      case 'byside': content = this.renderBySide()
         break;
       default:           content = this.renderByWar()
         break;
