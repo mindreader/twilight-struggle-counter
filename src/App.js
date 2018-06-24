@@ -142,25 +142,23 @@ class App extends Component {
         case 'highpriority': return true
         default: return true
       }
-    })
+    }).filter(c =>
+      this.state.data.get('phase') >= 3 || (this.state.data.get('phase') >= 2 && !c.get("late")) || (this.state.data.get('phase') === 1 && c.get("early"))
+    )
   }
 
   phase = () => this.state.data.get('phase')
 
   renderByWar() {
 
-    // TODO dry...
-    let early = this.cards().filter(c => c.get('early')).map(c =>
+    const cards = this.cards()
+    const f = (cfilter) => cards.filter(cfilter).map(c =>
       <Card key={c.get('key')} id={c.get('key')} side={c.get('side')} ops={c.get('ops')} name={c.get('name')} presence={this.state.data.getIn(['cardStates',c.get('key'), 'presence'])} onClick={this.cardClicked}/>
     ).toList()
 
-    let mid = this.phase() < 2 ? [] : this.cards().filter(c => c.get('mid')).map(c =>
-      <Card key={c.get('key')} id={c.get('key')} side={c.get('side')} ops={c.get('ops')} name={c.get('name')} presence={this.state.data.getIn(['cardStates',c.get('key'), 'presence'])} onClick={this.cardClicked}/>
-    ).toList()
-
-    let late = this.phase() < 3 ? [] : this.cards().filter(c => c.get('late')).map(c =>
-      <Card key={c.get('key')} id={c.get('key')} side={c.get('side')} ops={c.get('ops')} name={c.get('name')} presence={this.state.data.getIn(['cardStates',c.get('key'), 'presence'])} onClick={this.cardClicked}/>
-    ).toList()
+    let early = f(c => c.get('early'))
+    let mid = f(c => c.get('mid'))
+    let late = f(c => c.get('late'))
 
    return (
       <div>
