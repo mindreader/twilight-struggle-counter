@@ -1,4 +1,4 @@
-const { Map } = require("immutable");
+const { Map, Seq } = require("immutable");
 
 class Cards {
   static cards = () =>
@@ -236,6 +236,13 @@ class Cards {
         event: false,
         side: "ussr",
         ops: 2
+      }),
+      destal: Map({
+        name: "destalinization",
+        early: true,
+        event: true,
+        side: "ussr",
+        ops: 3
       }),
       un: Map({
         name: "un intervention",
@@ -737,128 +744,120 @@ class Cards {
         ops: 3
       })
     });
+  static cardRanking = () => Seq([
+        "ireds",
+        "romabd",
+        "olymp",
+        "yuri",
+        "kitch",
+        "ironl",
+        "norsea",
+        "evil",
+        "awac",
+        "eeu",
+        "shutt",
+        "reagan",
+        "one",
+        "cns",
+        "iiw",
+        "lads",
+        "ladc",
+        "summ",
+        "come",
+        "persh",
+        "u2",
+        "contra",
+        "viet",
+        "willy",
+        "cont",
+        "camp",
+        "jp2",
+        "form",
+        "solid",
+        "tehran",
+        "specr",
+        "armsr",
+        "cubmc",
+        "howil",
+        "indopw",
+        "un",
+        "brez",
+        "hostage",
+        "warsaw",
+        "marine",
+        "port",
+        "arisw",
+        "camb",
+        "ortega",
+        "fidel",
+        "allpro",
+        "d&c",
+        "sea",
+        "kal",
+        "tdtw",
+        "ask",
+        "chern",
+        "fyp",
+        "sw",
+        "nsubs",
+        "pupp",
+        "nix",
+        "oas",
+        "saddat",
+        "panam",
+        "salt",
+        "terr",
+        "misenv",
+        "flowr",
+        "musrev",
+        "glas",
+        "che",
+        "opec",
+        "degau",
+        "cult",
+        "socgov",
+        "suez",
+        "quag",
+        "safrun",
+        "korw",
+        "nass",
+        "trum",
+        "bw",
+        "mp",
+        "nato",
+        "nord",
+        "bear",
+        "ussu",
+        "def",
+        "voa",
+        "gsales",
+        "crg",
+        "soam",
+        "afr",
+        "cent",
+        "ntb",
+        "junta",
+        "wwby",
+        "refo",
+        "aldr",
+        "lib",
+        "all",
+        "destal",
+        "decol",
+        "japan",
+        "block",
+        "rsp",
+        "eu",
+        "asia",
+        "lone",
+        "cia",
+        "warg",
+  ])
 
-  static cardsWithImportance = () =>
-    Cards.cards().map((c, k) => {
-      switch (k) {
-        case "romabd":
-        case "ireds":
-        case "olymp":
-        case "yuri":
-        case "ironl":
-        case "norsea":
-        case "shutt":
-        case "eeu":
-        case "awac":
-        case "evil":
-        case "reagan":
-        case "kitch":
-        case "one":
-        case "cns":
-        case "iiw":
-        case "lads":
-        case "ladc":
-        case "summ":
-        case "come":
-        case "persh":
-        case "u2":
-        case "contra":
-        case "viet":
-          return c.set("importance", 1);
+  // console.log(Seq([1,2,3]).reduce((c,n) => n, 0))
+  static cardsWithImportance2 = () =>
+    Cards.cardRanking().reduce((stuff, card) => [stuff[0]+1, stuff[1].setIn([card,'importance'], stuff[0])] ,[1,Cards.cards()])[1]
 
-        case "willy":
-        case "cont":
-        case "camp":
-        case "jp2":
-        case "form":
-        case "solid":
-        case "tehran":
-        case "specr":
-        case "armsr":
-        case "cubmc":
-        case "howil":
-        case "indopw":
-        case "un":
-        case "brez":
-        case "hostage":
-        case "warsaw":
-        case "marine":
-        case "port":
-        case "arisw":
-        case "camb":
-        case "ortega":
-        case "fidel":
-        case "allpro":
-          return c.set("importance", 2);
-
-        case "d&c":
-        case "sea":
-        case "kal":
-        case "tdtw":
-        case "ask":
-        case "chern":
-        case "fyp":
-        case "sw":
-        case "nsubs":
-        case "pupp":
-        case "nix":
-        case "oas":
-        case "trum":
-        case "saddat":
-        case "panam":
-        case "salt":
-        case "terr":
-        case "misenv":
-        case "flowr":
-        case "musrev":
-        case "glas":
-        case "che":
-        case "opec":
-        case "degau":
-        case "cult":
-        case "socgov":
-        case "suez":
-        case "quag":
-        case "safrun":
-        case "korw":
-        case "nass":
-          return c.set("importance", 3);
-
-        case "asia":
-        case "rsp":
-        case "bw":
-        case "mp":
-        case "nato":
-        case "nord":
-        case "bear":
-        case "ussu":
-        case "def":
-        case "voa":
-        case "gsales":
-        case "crg":
-        case "cia":
-        case "soam":
-        case "afr":
-        case "eu":
-        case "cent":
-        case "mes":
-        case "ntb":
-        case "warg":
-        case "junta":
-        case "wwby":
-        case "refo":
-        case "aldr":
-        case "lib":
-        case "decol":
-        case "block":
-        case "lone":
-        case "japan":
-        case "all":
-          return c.set("importance", 4);
-
-        default:
-          return c.set("importance", 0);
-      }
-    });
+  static maxImportance = 6
 }
 export default Cards;

@@ -169,12 +169,12 @@ class App extends Component {
     };
     this.views = {
       war: "ops",
-      ops: "importance",
-      importance: "byside",
+      ops: "mostimportant",
+      mostimportant: "byside",
       byside: "war"
     };
 
-    this.allCards = Cards.cardsWithImportance();
+    this.allCards = Cards.cardsWithImportance2();
 
     this.cardClicked = this.cardClicked.bind(this);
 
@@ -188,7 +188,7 @@ class App extends Component {
           case "none":
             return 0;
           case "ops":
-            return c.get("ops") ? 5 - c.get("ops") : 0;
+            return c.get("ops") ? Cards.maxImportance + 1 - c.get("ops") : 0;
           case "name":
             return c.get("name");
           case "importance":
@@ -292,8 +292,8 @@ class App extends Component {
     );
   }
 
-  renderByImportance() {
-    const cards = this.cards()
+  renderByMostImportant() {
+    const cards = this.cards().take(15)
       .map((c, k) => (
         <Card
           key={k}
@@ -361,8 +361,8 @@ class App extends Component {
       case "ops":
         content = this.renderByOps();
         break;
-      case "importance":
-        content = this.renderByImportance();
+      case "mostimportant":
+        content = this.renderByMostImportant();
         break;
       case "byside":
         content = this.renderBySide();
