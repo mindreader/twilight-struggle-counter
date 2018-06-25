@@ -38,7 +38,7 @@ class Card extends Component {
         style={this.attrs()}
         onClick={() => this.props.onClick(this.props.id)}
       >
-        {this.props.ops} {this.props.name}
+        {this.props.ops == null ? "\u00A0\u00A0" : this.props.ops} {this.props.name}
       </li>
     );
   }
@@ -144,7 +144,7 @@ class App extends Component {
         viewBy: "byside", // war / ops value / importance / byside
         sortBy: "importance", // ops / name / importance
         filterBy: "none", // none / scoring / 2ops / 3ops / 4ops / high priority
-        phase: 3, // 1 = early, 2 = mid, 3 = late
+        phase: 1, // 1 = early, 2 = mid, 3 = late
         lastState: null
       })
     };
@@ -219,8 +219,13 @@ class App extends Component {
           this.state.data.get("phase") >= 3 ||
           (this.state.data.get("phase") >= 2 && !c.get("late")) ||
           (this.state.data.get("phase") === 1 && c.get("early"))
-      );
-  };
+      )
+      .sortBy((c,k) => {
+        let pres = this.state.data.getIn(['cardStates', k, 'presence'])
+         return pres === 'inhand' ? 2 :
+           (pres === 'discarded' ? 1 : 0)
+      })
+  }
 
   phase = () => this.state.data.get("phase");
 
