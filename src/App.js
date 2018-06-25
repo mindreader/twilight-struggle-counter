@@ -293,7 +293,8 @@ class App extends Component {
   }
 
   renderByMostImportant() {
-    const cards = this.cards().take(15)
+    const cards = this.cards()
+      .take(15)
       .map((c, k) => (
         <Card
           key={k}
