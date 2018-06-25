@@ -40,5 +40,20 @@
 
 .left, .right, .middle {
   float: left;
+}
+.cardCol {
   width: 33%;
+}
+
+.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.buttons {
+  width: 50%;
+}
+
+.hidden {
+  display: none;
 }

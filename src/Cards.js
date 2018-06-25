@@ -56,7 +56,7 @@ class Cards {
       olymp: Map({
         name: "olympic games",
         early: true,
-        event: true,
+        event: false,
         side: "neutral",
         ops: 2
       }),
@@ -848,6 +848,7 @@ class Cards {
       "japan",
       "block",
       "rsp",
+      "mes",
       "eu",
       "asia",
       "lone",
@@ -864,7 +865,5 @@ class Cards {
       ],
       [1, Cards.cards()]
     )[1];
-
-  static maxImportance = 6;
 }
 export default Cards;

@@ -40,6 +40,7 @@ class Card extends Component {
       >
         {this.props.ops == null ? "\u00A0\u00A0" : this.props.ops}{" "}
         {this.props.name}
+        {this.props.event ? "*" : ""}
       </li>
     );
   }
@@ -132,13 +133,15 @@ class App extends Component {
     });
   }
 
+  nextPhaseVisibility = () => this.state.data.get("phase") !== 3;
+
   // TODO hide in late war
   nextPhaseLabel = () => {
     switch (this.state.data.get("phase")) {
       case 1:
-        return "ADD MIDWAR";
+        return "Add Midwar";
       case 2:
-        return "ADD LATE WAR";
+        return "Add Late War";
       default:
         return "TODO";
     }
@@ -161,8 +164,8 @@ class App extends Component {
     // TODO filter by affects region
     this.filters = {
       none: "scoring",
-      scoring: "highpriority",
-      highpriority: "2ops",
+      scoring: "nonscoring",
+      nonscoring: "2ops",
       "2ops": "3ops",
       "3ops": "4ops",
       "4ops": "none"
@@ -188,15 +191,11 @@ class App extends Component {
           case "none":
             return 0;
           case "ops":
-            return c.get("ops") ? Cards.maxImportance + 1 - c.get("ops") : 0;
+            return c.get("ops") ? 5 - c.get("ops") : 0;
           case "name":
             return c.get("name");
           case "importance":
-            return (
-              100 -
-              10 * c.get("importance") +
-              (c.get("ops") ? 5 - c.get("ops") : 0)
-            ); // TODO this formula looks wrong to me
+            return Cards.cardRanking().size - c.get("importance");
 
           default:
             return c.get("name");
@@ -206,14 +205,14 @@ class App extends Component {
         switch (this.state.data.get("filterBy")) {
           case "scoring":
             return c.get("scoringcard");
+          case "nonscoring":
+            return !c.get("scoringcard");
           case "2ops":
             return c.get("ops") >= 2;
           case "3ops":
             return c.get("ops") >= 3;
           case "4ops":
             return c.get("ops") >= 4;
-          case "highpriority":
-            return c.get("importance") > 6;
           default:
             return true;
         }
@@ -243,6 +242,7 @@ class App extends Component {
             id={k}
             side={c.get("side")}
             ops={c.get("ops")}
+            event={c.get("event")}
             name={c.get("name")}
             presence={this.state.data.getIn(["cardStates", k, "presence"])}
             onClick={this.cardClicked}
@@ -255,14 +255,14 @@ class App extends Component {
     let late = f(c => c.get("late"));
 
     return (
-      <div>
-        <div class="left">
+      <div className="bywar">
+        <div className={["left", "cardCol"].join(" ")}>
           <ul>{late}</ul>
         </div>
-        <div class="middle">
+        <div className={["middle", "cardCol"].join(" ")}>
           <ul>{mid}</ul>
         </div>
-        <div class="right">
+        <div className={["right", "cardCol"].join(" ")}>
           <ul>{early}</ul>
         </div>
       </div>
@@ -277,6 +277,7 @@ class App extends Component {
           id={k}
           side={c.get("side")}
           ops={c.get("ops")}
+          event={c.get("event")}
           name={c.get("name")}
           presence={this.state.data.getIn(["cardStates", k, "presence"])}
           onClick={this.cardClicked}
@@ -285,7 +286,7 @@ class App extends Component {
       .toList();
     return (
       <div>
-        <div>
+        <div className={["center", "cardCol"].join(" ")}>
           <ul>{cards}</ul>
         </div>
       </div>
@@ -301,6 +302,7 @@ class App extends Component {
           id={k}
           side={c.get("side")}
           ops={c.get("ops")}
+          event={c.get("event")}
           name={c.get("name")}
           presence={this.state.data.getIn(["cardStates", k, "presence"])}
           onClick={this.cardClicked}
@@ -309,7 +311,7 @@ class App extends Component {
       .toList();
     return (
       <div>
-        <div>
+        <div className={["center", "cardCol"].join(" ")}>
           <ul>{cards}</ul>
         </div>
       </div>
@@ -327,6 +329,7 @@ class App extends Component {
             id={k}
             side={c.get("side")}
             ops={c.get("ops")}
+            event={c.get("event")}
             name={c.get("name")}
             presence={this.state.data.getIn(["cardStates", k, "presence"])}
             onClick={this.cardClicked}
@@ -340,13 +343,13 @@ class App extends Component {
 
     return (
       <div className="byside">
-        <div className="left">
+        <div className={["left", "cardCol"].join(" ")}>
           <ul>{us}</ul>
         </div>
-        <div className="middle">
+        <div className={["middle", "cardCol"].join(" ")}>
           <ul>{neutral}</ul>
         </div>
-        <div className="right">
+        <div className={["right", "cardCol"].join(" ")}>
           <ul>{ussr}</ul>
         </div>
       </div>
@@ -375,21 +378,33 @@ class App extends Component {
 
     return (
       <div className="App">
-        <button onClick={() => this.addDiscards()}>ADD DISCARDS</button>
-        <button onClick={() => this.changePhase()}>
-          {this.nextPhaseLabel()}
-        </button>
-        <button onClick={() => this.reset()}>RESET</button>
-        <button onClick={() => this.undo()}>UNDO</button>
-        <button onClick={() => this.changeView()}>
-          viewed by {this.state.data.get("viewBy")}
-        </button>
-        <button onClick={() => this.changeSort()}>
-          sorted by {this.state.data.get("sortBy")}
-        </button>
-        <button onClick={() => this.changeFilter()}>
-          filtered by {this.state.data.get("filterBy")}
-        </button>
+        <div className={["center", "buttons"].join(" ")}>
+          <button onClick={() => this.reset()}>Reset</button>
+          <button onClick={() => this.addDiscards()}>ReAdd Discards</button>
+          <button
+            className={this.nextPhaseVisibility() ? [] : ["hidden"]}
+            onClick={() => this.changePhase()}
+          >
+            {this.nextPhaseLabel()}
+          </button>
+        </div>
+        <div className={["center", "buttons"].join(" ")}>
+          <button onClick={() => this.changeView()}>
+            viewed by {this.state.data.get("viewBy")}
+          </button>
+          <button onClick={() => this.changeSort()}>
+            sorted by {this.state.data.get("sortBy")}
+          </button>
+          <button onClick={() => this.changeFilter()}>
+            filtered by {this.state.data.get("filterBy")}
+          </button>
+          <button
+            disabled={!this.state.data.get("lastState")}
+            onClick={() => this.undo()}
+          >
+            Undo
+          </button>
+        </div>
         {content}
       </div>
     );
