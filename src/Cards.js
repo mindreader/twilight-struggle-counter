@@ -856,7 +856,7 @@ class Cards {
     ]);
 
   // console.log(Seq([1,2,3]).reduce((c,n) => n, 0))
-  static cardsWithImportance2 = () =>
+  static cardsWithImportance = () =>
     Cards.cardRanking().reduce(
       (accum, card) => [
         accum[0] + 1,

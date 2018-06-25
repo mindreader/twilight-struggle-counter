@@ -174,7 +174,7 @@ class App extends Component {
       byside: "war"
     };
 
-    this.allCards = Cards.cardsWithImportance2();
+    this.allCards = Cards.cardsWithImportance();
 
     this.cardClicked = this.cardClicked.bind(this);
 
