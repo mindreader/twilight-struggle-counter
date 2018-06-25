@@ -38,7 +38,8 @@ class Card extends Component {
         style={this.attrs()}
         onClick={() => this.props.onClick(this.props.id)}
       >
-        {this.props.ops == null ? "\u00A0\u00A0" : this.props.ops} {this.props.name}
+        {this.props.ops == null ? "\u00A0\u00A0" : this.props.ops}{" "}
+        {this.props.name}
       </li>
     );
   }
@@ -67,7 +68,13 @@ class App extends Component {
       data: data.update("viewBy", vb => this.views[vb])
     }));
 
-  reset = () => this.setState(() => App.initialState(this.allCards));
+  reset = () =>
+    this.setState(({ data }) => ({
+      data: App.initialState(this.allCards)
+        .set("sortBy", data.get("sortBy"))
+        .set("filterBy", data.get("filterBy"))
+        .set("viewBy", data.get("viewBy"))
+    }));
 
   undo = () =>
     this.setState(({ data }) => {
@@ -137,18 +144,15 @@ class App extends Component {
     }
   };
 
-  static initialState = allCards => {
-    return {
-      data: Map({
-        cardStates: allCards.map(c => Map({ presence: "deck" })),
-        viewBy: "byside", // war / ops value / importance / byside
-        sortBy: "importance", // ops / name / importance
-        filterBy: "none", // none / scoring / 2ops / 3ops / 4ops / high priority
-        phase: 1, // 1 = early, 2 = mid, 3 = late
-        lastState: null
-      })
-    };
-  };
+  static initialState = allCards =>
+    Map({
+      cardStates: allCards.map(c => Map({ presence: "deck" })),
+      viewBy: "byside", // war / ops value / importance / byside
+      sortBy: "importance", // ops / name / importance
+      filterBy: "none", // none / scoring / 2ops / 3ops / 4ops / high priority
+      phase: 1, // 1 = early, 2 = mid, 3 = late
+      lastState: null
+    });
 
   constructor(props) {
     super(props);
@@ -174,7 +178,7 @@ class App extends Component {
 
     this.cardClicked = this.cardClicked.bind(this);
 
-    this.state = App.initialState(this.allCards);
+    this.state = { data: App.initialState(this.allCards) };
   }
 
   cards = () => {
@@ -220,12 +224,11 @@ class App extends Component {
           (this.state.data.get("phase") >= 2 && !c.get("late")) ||
           (this.state.data.get("phase") === 1 && c.get("early"))
       )
-      .sortBy((c,k) => {
-        let pres = this.state.data.getIn(['cardStates', k, 'presence'])
-         return pres === 'inhand' ? 2 :
-           (pres === 'discarded' ? 1 : 0)
-      })
-  }
+      .sortBy((c, k) => {
+        let pres = this.state.data.getIn(["cardStates", k, "presence"]);
+        return pres === "inhand" ? 2 : pres === "discarded" ? 1 : 0;
+      });
+  };
 
   phase = () => this.state.data.get("phase");
 
@@ -253,14 +256,14 @@ class App extends Component {
 
     return (
       <div>
-        <div>
-          <ul>{early}</ul>
+        <div class="left">
+          <ul>{late}</ul>
         </div>
-        <div>
+        <div class="middle">
           <ul>{mid}</ul>
         </div>
-        <div>
-          <ul>{late}</ul>
+        <div class="right">
+          <ul>{early}</ul>
         </div>
       </div>
     );

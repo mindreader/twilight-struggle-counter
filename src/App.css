@@ -33,7 +33,7 @@
   -khtml-user-select: none; /* webkit (konqueror) browsers */
   -ms-user-select: none; /* IE10+ */
 }
-.byside {
+.byside, .bywar {
   margin-left: 20%;
   margin-right: 20%;
 }
