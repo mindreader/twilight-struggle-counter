@@ -5,8 +5,6 @@ import SessionStorage from "./SessionStorage.js";
 
 const { Map, fromJS } = require("immutable");
 
-// TODO add an inhand section upon readding add an in opponents hand section
-// TODO record cards tossed on before add midwar ?
 // TODO limit undo history to a certain number of steps (30?)
 
 class Card extends Component {
@@ -125,7 +123,7 @@ class App extends Component {
       }).set("lastState", st);
     });
 
-  nextPhaseVisibility = () => this.state.data.get("phase") !== 3;
+  nextPhaseVisibility = () => this.state.data.get("phase") < 3;
 
   cardColor(card) {
     switch (this.state.data.getIn(["cardStates", card, "presence"])) {
@@ -134,7 +132,6 @@ class App extends Component {
       case "deck":
       case "inhand":
       case "ophand":
-
         return this.allCards.getIn([card, "side"]) === "ussr"
           ? "red"
           : this.allCards.getIn([card, "side"]) === "us"
@@ -147,15 +144,12 @@ class App extends Component {
     }
   }
 
-  // TODO hide in late war
   nextPhaseLabel = () => {
     switch (this.state.data.get("phase")) {
       case 1:
         return "add mid war";
-      case 2:
-        return "add late war";
       default:
-        return "TODO";
+        return "add late war";
     }
   };
 
@@ -257,11 +251,11 @@ class App extends Component {
     const cards = this.cards();
     const f = cfilter =>
       cards
-        .filter((c,k) => {
-          const pres = this.state.data.getIn(["cardStates", k, "presence"])
-          return pres !== "inhand" && pres !== "ophand"
-        })
         .filter(cfilter)
+        .filter((c, k) => {
+          const pres = this.state.data.getIn(["cardStates", k, "presence"]);
+          return pres !== "inhand" && pres !== "ophand";
+        })
         .map((c, k) => this.renderCard(k, c))
         .toList();
 
@@ -271,14 +265,14 @@ class App extends Component {
 
     return (
       <div className="bywar">
-        <div className={["left", "cardCol"].join(" ")}>
+        <div className="cardCol">
           <ul>{late}</ul>
         </div>
-        <div className={["middle", "cardCol"].join(" ")}>
-          <ul>{early}</ul>
-        </div>
-        <div className={["right", "cardCol"].join(" ")}>
+        <div className="cardCol">
           <ul>{mid}</ul>
+        </div>
+        <div className="cardCol">
+          <ul>{early}</ul>
         </div>
       </div>
     );
@@ -289,6 +283,10 @@ class App extends Component {
     const f = cfilter =>
       cards
         .filter(cfilter)
+        .filter((c, k) => {
+          const pres = this.state.data.getIn(["cardStates", k, "presence"]);
+          return pres !== "inhand" && pres !== "ophand";
+        })
         .map((c, k) => this.renderCard(k, c))
         .toList();
 
@@ -298,13 +296,13 @@ class App extends Component {
 
     return (
       <div className="byside">
-        <div className={["left", "cardCol"].join(" ")}>
+        <div className="cardCol">
           <ul>{us}</ul>
         </div>
-        <div className={["middle", "cardCol"].join(" ")}>
+        <div className="cardCol">
           <ul>{neutral}</ul>
         </div>
-        <div className={["right", "cardCol"].join(" ")}>
+        <div className="cardCol">
           <ul>{ussr}</ul>
         </div>
       </div>
@@ -341,14 +339,13 @@ class App extends Component {
       </option>
     ));
 
-    const yourhand = this.allCards
+    const yourhand = this.cards()
       .filter((c, k) => this.state.data.getIn(["cardStates", k, "presence"]) === "inhand")
       .map((c, k) => this.renderCard(k, c))
       .toList();
 
-    const ophand = this.allCards
+    const ophand = this.cards()
       .filter((c, k) => this.state.data.getIn(["cardStates", k, "presence"]) === "ophand")
-      .filter(c => this.phaseFilter(c))
       .map((c, k) => this.renderCard(k, c))
       .toList();
 

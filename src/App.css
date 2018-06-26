@@ -45,11 +45,6 @@
   max-width: 80%;
 }
 
-.left,
-.right,
-.middle {
-  float: left;
-}
 .cardCol, .hand {
   display: inline-block;
   padding: 5px;
@@ -70,7 +65,7 @@
   width: 50%;
 }
 
-card.hidden {
+card.hidden, button.hidden {
   display: none;
 }
 
