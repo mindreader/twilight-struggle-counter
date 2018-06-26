@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import "./App.css";
 import Cards from "./Cards.js";
-import SessionStorage from "./SessionStorage.js"
+import SessionStorage from "./SessionStorage.js";
 
 const { Map, fromJS } = require("immutable");
 
-// TODO add an inhand section
-// TODO upon readding add an in opponents hand section
+// TODO add an inhand section upon readding add an in opponents hand section
 // TODO record cards tossed on before add midwar ?
+// TODO limit undo history to a certain number of steps (30?)
 
 class Card extends Component {
   attrs() {
@@ -35,7 +35,6 @@ class Card extends Component {
             this.props.onDiscard(this.props.id);
           }}
         />
-
         {this.props.ops == null ? "\u00A0\u00A0" : this.props.ops} {this.props.name}
       </li>
     );
@@ -43,8 +42,7 @@ class Card extends Component {
 }
 
 class App extends Component {
-
-  appSaveState = (f) => this.setState(st => SessionStorage.set(f(st)))
+  appSaveState = f => this.setState(st => SessionStorage.set(f(st)));
 
   changePhase = () =>
     this.appSaveState(({ data }) => ({
@@ -102,25 +100,22 @@ class App extends Component {
     this.appSaveState(({ data }) => {
       return {
         data: data
-          .set(
-            "cardStates",
-            data.get("cardStates").map(c => c.update("presence", presence => (presence === "discarded" ? "deck" : presence)))
+          .update("cardStates", cs =>
+            cs.map(c => c.update("presence", presence => (presence === "discarded" ? "deck" : presence === "deck" ? "ophand" : presence)))
           )
           .set("lastState", data)
       };
     });
   };
 
+  toHandCard = card => this.moveCard(card, "inhand");
+  discardCard = card => this.moveCard(card, "discarded");
+  removeCard = card => this.moveCard(card, "removed");
 
-  toHandCard = card => this.moveCard(card, "inhand")
-  discardCard= card => this.moveCard(card, "discarded")
-  removeCard = card => this.moveCard(card, "removed")
-
-  moveCard = (card,to) =>
+  moveCard = (card, to) =>
     this.appSaveState(({ data }) => ({
       data: data.setIn(["cardStates", card, "presence"], to).set("lastState", data)
     }));
-
 
   cardClicked(card) {
     this.appSaveState(({ data }) => {
@@ -132,6 +127,7 @@ class App extends Component {
               case "deck":
                 return "inhand";
               case "inhand":
+              case "ophand":
                 return "discarded";
               case "discarded":
                 return event ? "removed" : presence;
@@ -147,14 +143,19 @@ class App extends Component {
   nextPhaseVisibility = () => this.state.data.get("phase") !== 3;
 
   cardColor(card) {
-//    console.log(this.state.data.getIn(['cardStates']))
+    //    console.log(this.state.data.getIn(['cardStates']))
     switch (this.state.data.getIn(["cardStates", card, "presence"])) {
       case "inhand":
+      case "ophand":
         return "black";
       case "discarded":
         return "gray";
       case "deck":
-        return this.allCards.getIn([card, "side"]) === "ussr" ? "red" : this.allCards.getIn([card, "side"]) === "us" ? "blue" : "purple";
+        return this.allCards.getIn([card, "side"]) === "ussr"
+          ? "red"
+          : this.allCards.getIn([card, "side"]) === "us"
+            ? "blue"
+            : "purple";
       case "removed":
         return "black";
       default:
@@ -188,7 +189,7 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.storage = SessionStorage.storageAvailable("sessionStorage")
+    this.storage = SessionStorage.storageAvailable("sessionStorage");
 
     this.sorts = ["name", "importance", "ops"];
     // TODO filter by affects region
@@ -199,35 +200,38 @@ class App extends Component {
 
     this.cardClicked = this.cardClicked.bind(this);
 
-
-    this.state = { data: this.storage && SessionStorage.has() ? fromJS(SessionStorage.get()) : App.initialState(this.allCards) };
+    this.state = {
+      data: this.storage && SessionStorage.has() ? fromJS(SessionStorage.get()) : App.initialState(this.allCards)
+    };
   }
 
+  phaseFilter = (card) => {
+    const phase = this.state.data.get("phase")
+    return phase >= 3 || (phase >= 2 && !card.get("late")) || (phase === 1 && card.get("early"))
+  }
+
+
   cards = () => {
-    let c = this.allCards.filter(
-      c =>
-        this.state.data.get("phase") >= 3 ||
-        (this.state.data.get("phase") >= 2 && !c.get("late")) ||
-        (this.state.data.get("phase") === 1 && c.get("early"))
-    );
+    let c = this.allCards.filter(c => this.phaseFilter(c))
     if (this.state.data.get("filterBy") === "mostimportant") {
       c = c.sortBy(c => Cards.cardRanking().size - c.get("importance")).take(15);
     }
-    return c.sortBy(c => {
-      switch (this.state.data.get("sortBy")) {
-        case "none":
-          return 0;
-        case "ops":
-          return c.get("ops") ? 5 - c.get("ops") : 0;
-        case "name":
-          return c.get("name");
-        case "importance":
-          return Cards.cardRanking().size - c.get("importance");
+    return c
+      .sortBy(c => {
+        switch (this.state.data.get("sortBy")) {
+          case "none":
+            return 0;
+          case "ops":
+            return c.get("ops") ? 5 - c.get("ops") : 0;
+          case "name":
+            return c.get("name");
+          case "importance":
+            return Cards.cardRanking().size - c.get("importance");
 
-        default:
-          return c.get("name");
-      }
-    })
+          default:
+            return c.get("name");
+        }
+      })
       .filter(c => {
         switch (this.state.data.get("filterBy")) {
           case "scoring":
@@ -246,7 +250,7 @@ class App extends Component {
       })
       .sortBy((c, k) => {
         let pres = this.state.data.getIn(["cardStates", k, "presence"]);
-        return pres === "inhand" ? 2 : pres === "discarded" ? 1 : 0;
+        return pres === "discarded" ? 1 : 0;
       });
   };
 
@@ -286,10 +290,10 @@ class App extends Component {
           <ul>{late}</ul>
         </div>
         <div className={["middle", "cardCol"].join(" ")}>
-          <ul>{mid}</ul>
+          <ul>{early}</ul>
         </div>
         <div className={["right", "cardCol"].join(" ")}>
-          <ul>{early}</ul>
+          <ul>{mid}</ul>
         </div>
       </div>
     );
@@ -352,16 +356,29 @@ class App extends Component {
       </option>
     ));
 
+    const yourhand = this.allCards
+      .filter((c, k) => this.state.data.getIn(["cardStates", k, "presence"]) === "inhand")
+      .map((c, k) => this.renderCard(k, c))
+      .toList();
+
+    const ophand = this.allCards
+      .filter((c, k) => this.state.data.getIn(["cardStates", k, "presence"]) === "ophand")
+      .filter(c => this.phaseFilter(c))
+      .map((c, k) => this.renderCard(k, c))
+      .toList();
+
+
     return (
       <div className="App">
-        <div className={["center", "buttons"].join(" ")}>
+        <div className={["buttons"].join(" ")}>
           <button onClick={() => this.reset()}>reset</button>
           <button onClick={() => this.addDiscards()}>readd discards</button>
           <button className={this.nextPhaseVisibility() ? [] : ["hidden"]} onClick={() => this.changePhase()}>
             {this.nextPhaseLabel()}
           </button>
         </div>
-        <div className={["center", "buttons"].join(" ")}>
+
+        <div className={["buttons"].join(" ")}>
           <label>
             view:
             <select value={this.state.data.get("viewBy")} onChange={this.setView}>
@@ -383,10 +400,25 @@ class App extends Component {
           <button disabled={!this.state.data.get("lastState")} onClick={() => this.undo()}>
             undo
           </button>
-          <label>
+          {/* <label>
             show discarded<input type="checkbox" onChange={this.toggleDiscards} />
-          </label>
+          </label> */}
         </div>
+        <div className="bothhands">
+          <div className="hand lefthand">
+            <fieldset>
+              <legend>Your Hand</legend>
+              {yourhand}
+            </fieldset>
+          </div>
+          <div className="hand righthand">
+            <fieldset>
+              <legend>Opponent Hand</legend>
+              {ophand}
+            </fieldset>
+          </div>
+        </div>
+
         {content}
       </div>
     );
