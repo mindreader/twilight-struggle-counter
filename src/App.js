@@ -129,12 +129,12 @@ class App extends Component {
 
   cardColor(card) {
     switch (this.state.data.getIn(["cardStates", card, "presence"])) {
-      case "inhand":
-      case "ophand":
-        return "black";
       case "discarded":
         return "gray";
       case "deck":
+      case "inhand":
+      case "ophand":
+
         return this.allCards.getIn([card, "side"]) === "ussr"
           ? "red"
           : this.allCards.getIn([card, "side"]) === "us"
@@ -259,6 +259,10 @@ class App extends Component {
     const cards = this.cards();
     const f = cfilter =>
       cards
+        .filter((c,k) => {
+          const pres = this.state.data.getIn(["cardStates", k, "presence"])
+          return pres !== "inhand" && pres !== "ophand"
+        })
         .filter(cfilter)
         .map((c, k) => this.renderCard(k, c))
         .toList();
