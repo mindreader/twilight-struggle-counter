@@ -237,8 +237,6 @@ class App extends Component {
       });
   };
 
-  phase = () => this.state.data.get("phase");
-
   renderCard = (k, c) => (
     <Card
       key={k}
