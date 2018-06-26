@@ -42,70 +42,60 @@ class Card extends Component {
 }
 
 class App extends Component {
-  appSaveState = f => this.setState(st => SessionStorage.set(f(st)));
+  appSaveState = f => this.setState(({ data }) => ({ data: SessionStorage.set(f(data)) }));
 
-  changePhase = () =>
-    this.appSaveState(({ data }) => ({
-      data: data.update("phase", p => (p < 3 ? p + 1 : 1)).set("lastState", data)
-    }));
+  changePhase = () => this.appSaveState(st => st.update("phase", p => (p < 3 ? p + 1 : 1)).set("lastState", st));
 
-  toggleDiscards = () =>
-    this.appSaveState(({ data }) => ({
-      data: data.update("showDiscards", d => !d)
-    }));
+  toggleDiscards = () => this.appSaveState(st => st.update("showDiscards", d => !d));
 
   setSort = event => {
     const ns = event.target.value;
-    this.appSaveState(({ data }) => ({
-      data: data.set("sortBy", ns)
-    }));
+    this.appSaveState(st => st.set("sortBy", ns));
   };
 
   setFilter = event => {
     const nf = event.target.value;
-    this.appSaveState(({ data }) => ({
-      data: data.set("filterBy", nf)
-    }));
+    this.appSaveState(st => st.set("filterBy", nf));
   };
 
   setView = event => {
     const nv = event.target.value;
-    this.appSaveState(({ data }) => ({
-      data: data.set("viewBy", nv)
-    }));
+    this.appSaveState(st => st.set("viewBy", nv));
   };
 
   reset = () =>
-    this.appSaveState(({ data }) => ({
-      data: App.initialState(this.allCards)
-        .set("sortBy", data.get("sortBy"))
-        .set("filterBy", data.get("filterBy"))
-        .set("viewBy", data.get("viewBy"))
-    }));
+    this.appSaveState(st =>
+      App.initialState(this.allCards)
+        .set("sortBy", st.get("sortBy"))
+        .set("filterBy", st.get("filterBy"))
+        .set("viewBy", st.get("viewBy"))
+    );
 
   undo = () =>
-    this.appSaveState(({ data }) => {
-      return {
-        data: !data.get("lastState")
-          ? data
-          : data
+    this.appSaveState(
+      st =>
+        !st.get("lastState")
+          ? st
+          : st
               .get("lastState")
-              .set("sortBy", data.get("sortBy"))
-              .set("filterBy", data.get("filterBy"))
-              .set("viewBy", data.get("viewBy"))
-      };
-    });
+              .set("sortBy", st.get("sortBy"))
+              .set("filterBy", st.get("filterBy"))
+              .set("viewBy", st.get("viewBy"))
+    );
 
   addDiscards = () => {
-    this.appSaveState(({ data }) => {
-      return {
-        data: data
-          .update("cardStates", cs =>
-            cs.map(c => c.update("presence", presence => (presence === "discarded" ? "deck" : presence === "deck" ? "ophand" : presence)))
+    this.appSaveState(st =>
+      st
+        .update("cardStates", cs =>
+          cs.map(c =>
+            c.update(
+              "presence",
+              presence => (presence === "discarded" ? "deck" : presence === "deck" ? "ophand" : presence)
+            )
           )
-          .set("lastState", data)
-      };
-    });
+        )
+        .set("lastState", st)
+    );
   };
 
   toHandCard = card => this.moveCard(card, "inhand");
@@ -113,37 +103,31 @@ class App extends Component {
   removeCard = card => this.moveCard(card, "removed");
 
   moveCard = (card, to) =>
-    this.appSaveState(({ data }) => ({
-      data: data.setIn(["cardStates", card, "presence"], to).set("lastState", data)
-    }));
-
-  cardClicked(card) {
-    this.appSaveState(({ data }) => {
-      return {
-        data: data
-          .updateIn(["cardStates", card, "presence"], presence => {
-            const event = this.allCards.getIn([card, "event"]);
-            switch (presence) {
-              case "deck":
-                return "inhand";
-              case "inhand":
-              case "ophand":
-                return "discarded";
-              case "discarded":
-                return event ? "removed" : presence;
-              default:
-                return presence;
-            }
-          })
-          .set("lastState", data)
-      };
+    this.appSaveState(st => {
+      return st.setIn(["cardStates", card, "presence"], to).set("lastState", st);
     });
-  }
+
+  cardClicked = card =>
+    this.appSaveState(st => {
+      st.updateIn(["cardStates", card, "presence"], presence => {
+        const event = this.allCards.getIn([card, "event"]);
+        switch (presence) {
+          case "deck":
+            return "inhand";
+          case "inhand":
+          case "ophand":
+            return "discarded";
+          case "discarded":
+            return event ? "removed" : presence;
+          default:
+            return presence;
+        }
+      }).set("lastState", st);
+    });
 
   nextPhaseVisibility = () => this.state.data.get("phase") !== 3;
 
   cardColor(card) {
-    //    console.log(this.state.data.getIn(['cardStates']))
     switch (this.state.data.getIn(["cardStates", card, "presence"])) {
       case "inhand":
       case "ophand":
@@ -205,14 +189,13 @@ class App extends Component {
     };
   }
 
-  phaseFilter = (card) => {
-    const phase = this.state.data.get("phase")
-    return phase >= 3 || (phase >= 2 && !card.get("late")) || (phase === 1 && card.get("early"))
-  }
-
+  phaseFilter = card => {
+    const phase = this.state.data.get("phase");
+    return phase >= 3 || (phase >= 2 && !card.get("late")) || (phase === 1 && card.get("early"));
+  };
 
   cards = () => {
-    let c = this.allCards.filter(c => this.phaseFilter(c))
+    let c = this.allCards.filter(c => this.phaseFilter(c));
     if (this.state.data.get("filterBy") === "mostimportant") {
       c = c.sortBy(c => Cards.cardRanking().size - c.get("importance")).take(15);
     }
@@ -366,7 +349,6 @@ class App extends Component {
       .filter(c => this.phaseFilter(c))
       .map((c, k) => this.renderCard(k, c))
       .toList();
-
 
     return (
       <div className="App">

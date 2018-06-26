@@ -26,7 +26,7 @@ class SessionStorage {
 
   static set = st => {
     try {
-      sessionStorage.setItem("state", JSON.stringify(st.data));
+      sessionStorage.setItem("state", JSON.stringify(st));
       return st
     } catch (e) {
       console.log("Could not store in session storage");
