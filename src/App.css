@@ -23,8 +23,12 @@
 }
 
 @keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .card {
@@ -33,12 +37,15 @@
   -khtml-user-select: none; /* webkit (konqueror) browsers */
   -ms-user-select: none; /* IE10+ */
 }
-.byside, .bywar {
+.byside,
+.bywar {
   margin-left: 20%;
   margin-right: 20%;
 }
 
-.left, .right, .middle {
+.left,
+.right,
+.middle {
   float: left;
 }
 .cardCol {
@@ -54,6 +61,16 @@
   width: 50%;
 }
 
-.hidden {
+card.hidden {
   display: none;
+}
+
+.discard,
+.remove {
+  color: #999;
+  margin-right: 2px;
+}
+
+.remove.hidden {
+  visibility: hidden;
 }

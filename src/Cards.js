@@ -40,7 +40,7 @@ class Cards {
         scoringcard: true
       }),
       romabd: Map({
-        name: "roman abdication",
+        name: "romanian abdication",
         early: true,
         event: true,
         side: "ussr",
@@ -715,23 +715,23 @@ class Cards {
       }),
       camb: Map({
         name: "the cambridge five",
-        late: true,
+        early: true,
         event: false,
         side: "ussr",
         ops: 2
       }),
       specr: Map({
         name: "special relationship",
-        late: true,
+        early: true,
         event: false,
         side: "us",
         ops: 2
       }),
-      nord: Map({ name: "norad", late: true, event: true, side: "us", ops: 3 }),
-      che: Map({ name: "che", late: true, event: true, side: "ussr", ops: 3 }),
+      nord: Map({ name: "norad", early: true, event: true, side: "us", ops: 3 }),
+      che: Map({ name: "che", mid: true, event: true, side: "ussr", ops: 3 }),
       tehran: Map({
         name: "our man in tehran",
-        late: true,
+        mid: true,
         event: true,
         side: "us",
         ops: 2
