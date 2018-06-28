@@ -50,7 +50,7 @@ class Cards {
         name: "independent reds",
         early: true,
         event: true,
-        side: "ussr",
+        side: "us",
         ops: 2
       }),
       olymp: Map({
