@@ -11,19 +11,12 @@ const { Map, fromJS } = require("immutable");
 // card count
 
 class Card extends Component {
-  attrs() {
-    return {
-      color: this.props.color,
-      display: this.props.hidden ? "none" : "block"
-    };
-  }
-
   render() {
     // TODO get rid of style attribute
     return (
       <li
         className="card"
-        style={this.attrs()}
+        style={{color: this.props.color}}
         onClick={e => {
           e.stopPropagation();
           this.props.onToHand(this.props.id);
@@ -43,7 +36,7 @@ class Card extends Component {
             this.props.onDiscard(this.props.id);
           }}
         />
-        {this.props.ops == null ? "\u00A0\u00A0" : this.props.ops} {this.props.name}
+        {this.props.ops == null ? <i className="score fas fa-star-half-alt"/> : "\u00A0" + this.props.ops} {this.props.name}
       </li>
     );
   }
@@ -152,16 +145,15 @@ class App extends Component {
   cardColor(card) {
     switch (this.state.data.getIn(["cardStates", card, "presence"])) {
       case "discarded":
-        return "gray";
       case "deck":
       case "inhand":
       case "ophand":
+      case "removed":
         return this.allCards.getIn([card, "side"]) === "ussr"
           ? "red"
           : this.allCards.getIn([card, "side"]) === "us"
             ? "blue"
             : "purple";
-      case "removed":
         return "black";
       default:
         return "black";
@@ -313,7 +305,7 @@ class App extends Component {
         .filter(cfilter)
         .filter((c, k) => {
           const pres = this.state.data.getIn(["cardStates", k, "presence"]);
-          return pres !== "inhand" && pres !== "ophand";
+          return pres !== "inhand" && pres !== "ophand" && pres !== "discarded";
         })
         .map((c, k) => this.renderCard(k, c))
         .toList();
@@ -345,6 +337,36 @@ class App extends Component {
       </div>
     );
   }
+
+  renderDiscardRemoved = () => {
+
+    const keep = (pres) => this.cards()
+      .filter((c, k) => {
+        return this.state.data.getIn(["cardStates", k, "presence"]) === pres;
+      })
+      .map((c, k) => this.renderCard(k, c))
+      .toList();
+
+    const discards = keep("discarded")
+    const removes = keep("removed")
+
+    return (
+      <div className="discardpile">
+        <div id="discarded" className="cardCol">
+          <fieldset>
+            <legend align="center">discard</legend>
+            <ul>{discards}</ul>
+          </fieldset>
+        </div>
+        <div id="removed" className="cardCol">
+          <fieldset>
+            <legend align="center">removed</legend>
+            <ul>{removes}</ul>
+          </fieldset>
+        </div>
+      </div>
+    );
+  };
 
   render() {
     let content = null;
@@ -426,7 +448,7 @@ class App extends Component {
           <div className="hand lefthand" onClick={this.toggleUSSR}>
             <fieldset>
               <legend>Your Hand ({yourhand.count()})</legend>
-              {yourhand}
+              <ul>{yourhand}</ul>
             </fieldset>
           </div>
           <div
@@ -437,12 +459,13 @@ class App extends Component {
           >
             <fieldset>
               <legend>Opponent Hand ({ophand.count()})</legend>
-              {ophand}
+              <ul>{ophand}</ul>
             </fieldset>
           </div>
         </div>
 
         {content}
+        <div>{this.renderDiscardRemoved()}</div>
         {/*<div>
       {JSON.stringify(this.state.data.get('cardStates'))}
         </div>*/}

@@ -1,11 +1,12 @@
-.card {
+acard, .hand, .hand > fieldset > legend {
   -webkit-user-select: none; /* webkit (safari, chrome) browsers */
   -moz-user-select: none; /* mozilla browsers */
   -khtml-user-select: none; /* webkit (konqueror) browsers */
   -ms-user-select: none; /* IE10+ */
 }
 .byside,
-.bywar {
+.bywar,
+.discardpile {
   display: flex;
   justify-content: center;
   margin: 0 auto;
@@ -31,17 +32,22 @@
 .buttons {
   width: 50%;
 }
+ul {
+  padding: 0px;
+  list-style-type: none;
+}
 
-card.hidden, button.hidden {
+button.hidden {
   display: none;
 }
 
-.discard,
-.remove,
-.toophand {
+i.discard,
+i.remove,
+i.score {
   color: #999;
-  margin-right: 2px;
+  margin: 1px;
 }
+
 
 div.handselected > fieldset {
   color: red;
@@ -52,6 +58,10 @@ div.handselected > fieldset {
   display: none;
 }
 
-.remove.hidden {
-  visibility: hidden;
+#removed i.remove, #discarded i.discard {
+  display: none
+}
+
+.star {
+  color: gray;
 }
