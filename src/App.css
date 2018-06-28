@@ -37,9 +37,19 @@ card.hidden, button.hidden {
 }
 
 .discard,
-.remove {
+.remove,
+.toophand {
   color: #999;
   margin-right: 2px;
+}
+
+div.handselected > fieldset {
+  color: red;
+  border: 1px solid red;
+}
+
+.hand .toophand {
+  display: none;
 }
 
 .remove.hidden {

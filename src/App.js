@@ -6,6 +6,9 @@ import SessionStorage from "./SessionStorage.js";
 const { Map, fromJS } = require("immutable");
 
 // TODO limit undo history to a certain number of steps (30?)
+// game log?
+// view byregion
+// card count
 
 class Card extends Component {
   attrs() {
@@ -18,7 +21,14 @@ class Card extends Component {
   render() {
     // TODO get rid of style attribute
     return (
-      <li className="card" style={this.attrs()} onClick={() => this.props.onToHand(this.props.id)}>
+      <li
+        className="card"
+        style={this.attrs()}
+        onClick={e => {
+          e.stopPropagation();
+          this.props.onToHand(this.props.id);
+        }}
+      >
         <i
           className={["remove fas fa-ban"].concat(this.props.event ? [] : ["hidden"]).join(" ")}
           onClick={e => {
@@ -46,6 +56,9 @@ class App extends Component {
 
   toggleDiscards = () => this.appSaveState(st => st.update("showDiscards", d => !d));
 
+  toggleUSSR = () =>
+    this.appSaveState(st => st.update("ussrSelected", oldside => (oldside !== "ussr" ? "ussr" : null)));
+
   setSort = event => {
     const ns = event.target.value;
     this.appSaveState(st => st.set("sortBy", ns));
@@ -67,6 +80,7 @@ class App extends Component {
         .set("sortBy", st.get("sortBy"))
         .set("filterBy", st.get("filterBy"))
         .set("viewBy", st.get("viewBy"))
+        .set("ussrSelected", st.get("ussrSelected"))
     );
 
   undo = () =>
@@ -79,16 +93,29 @@ class App extends Component {
               .set("sortBy", st.get("sortBy"))
               .set("filterBy", st.get("filterBy"))
               .set("viewBy", st.get("viewBy"))
+              .set("ussrSelected", st.get("ussrSelected"))
     );
+
+  /*  fix =  () => {
+    this.appSaveState(st =>
+      st.setIn(['cardStates', 'abm', 'presence'], "deck")
+    )
+    console.log(this.state.data.getIn(['cardStates','abm']).toJS())
+  } */
 
   addDiscards = () => {
     this.appSaveState(st =>
       st
         .update("cardStates", cs =>
-          cs.map(c =>
+          cs.map((c, k) =>
             c.update(
               "presence",
-              presence => (presence === "discarded" ? "deck" : presence === "deck" ? "ophand" : presence)
+              presence =>
+                presence === "discarded"
+                  ? "deck"
+                  : presence === "deck" && this.phaseFilter(this.allCards.get(k))
+                    ? "ophand"
+                    : presence
             )
           )
         )
@@ -96,14 +123,11 @@ class App extends Component {
     );
   };
 
-  toHandCard = card => this.moveCard(card, "inhand");
+  toHandCard = card => this.moveCard(card, this.state.data.get("ussrSelected") === "ussr" ? "ophand" : "inhand");
   discardCard = card => this.moveCard(card, "discarded");
   removeCard = card => this.moveCard(card, "removed");
 
-  moveCard = (card, to) =>
-    this.appSaveState(st => {
-      return st.setIn(["cardStates", card, "presence"], to).set("lastState", st);
-    });
+  moveCard = (card, to) => this.appSaveState(st => st.setIn(["cardStates", card, "presence"], to).set("lastState", st));
 
   cardClicked = card =>
     this.appSaveState(st => {
@@ -161,6 +185,7 @@ class App extends Component {
       filterBy: "none", // none / scoring / 2ops / 3ops / 4ops / high priority
       showDiscards: true,
       phase: 1, // 1 = early, 2 = mid, 3 = late
+      ussrSelected: null,
       lastState: null
     });
 
@@ -172,9 +197,9 @@ class App extends Component {
     this.sorts = ["name", "importance", "ops"];
     // TODO filter by affects region
     this.filters = ["none", "mostimportant", "scoring", "nonscoring", "2ops", "3ops", "4ops"];
-    this.views = ["war", "byside"];
+    this.views = ["region", "byside"];
 
-    this.allCards = Cards.cardsWithImportance();
+    this.allCards = Cards.cards();
 
     this.cardClicked = this.cardClicked.bind(this);
 
@@ -231,23 +256,26 @@ class App extends Component {
       });
   };
 
-  renderCard = (k, c) => (
-    <Card
-      key={k}
-      id={k}
-      side={c.get("side")}
-      ops={c.get("ops")}
-      event={c.get("event")}
-      name={c.get("name")}
-      color={this.cardColor(k)}
-      hidden={this.state.data.getIn(["cardStates", k, "presence"]) === "removed"}
-      onToHand={this.toHandCard}
-      onDiscard={this.discardCard}
-      onRemove={this.removeCard}
-    />
-  );
+  renderCard = (k, c) => {
+    const pres = this.state.data.getIn(["cardStates", k, "presence"]);
+    return (
+      <Card
+        key={k}
+        id={k}
+        side={c.get("side")}
+        ops={c.get("ops")}
+        event={c.get("event")}
+        name={c.get("name")}
+        color={this.cardColor(k)}
+        hidden={pres === "removed"}
+        onToHand={this.toHandCard}
+        onDiscard={this.discardCard}
+        onRemove={this.removeCard}
+      />
+    );
+  };
 
-  renderByWar() {
+  renderByRegion() {
     const cards = this.cards();
     const f = cfilter =>
       cards
@@ -264,7 +292,7 @@ class App extends Component {
     let late = f(c => c.get("late"));
 
     return (
-      <div className="bywar">
+      <div className="byregion">
         <div className="cardCol">
           <ul>{late}</ul>
         </div>
@@ -297,13 +325,22 @@ class App extends Component {
     return (
       <div className="byside">
         <div className="cardCol">
-          <ul>{us}</ul>
+          <fieldset>
+            <legend align="center">us</legend>
+            <ul>{us}</ul>
+          </fieldset>
         </div>
         <div className="cardCol">
-          <ul>{neutral}</ul>
+          <fieldset>
+            <legend align="center">neutral</legend>
+            <ul>{neutral}</ul>
+          </fieldset>
         </div>
         <div className="cardCol">
-          <ul>{ussr}</ul>
+          <fieldset>
+            <legend align="center">ussr</legend>
+            <ul>{ussr}</ul>
+          </fieldset>
         </div>
       </div>
     );
@@ -312,14 +349,14 @@ class App extends Component {
   render() {
     let content = null;
     switch (this.state.data.get("viewBy")) {
-      case "war":
-        content = this.renderByWar();
+      case "region":
+        content = this.renderByRegion();
         break;
       case "byside":
         content = this.renderBySide();
         break;
       default:
-        content = this.renderByWar();
+        content = this.renderBySide();
         break;
     }
 
@@ -378,7 +415,7 @@ class App extends Component {
               {filterOptions}
             </select>
           </label>
-          <button disabled={!this.state.data.get("lastState")} onClick={() => this.undo()}>
+          <button disabled={!this.state.data.get("lastState")} onClick={this.undo}>
             undo
           </button>
           {/* <label>
@@ -386,21 +423,29 @@ class App extends Component {
           </label> */}
         </div>
         <div className="bothhands">
-          <div className="hand lefthand">
+          <div className="hand lefthand" onClick={this.toggleUSSR}>
             <fieldset>
-              <legend>Your Hand</legend>
+              <legend>Your Hand ({yourhand.count()})</legend>
               {yourhand}
             </fieldset>
           </div>
-          <div className="hand righthand">
+          <div
+            className={["hand", "righthand"]
+              .concat(this.state.data.get("ussrSelected") === "ussr" ? ["handselected"] : [])
+              .join(" ")}
+            onClick={this.toggleUSSR}
+          >
             <fieldset>
-              <legend>Opponent Hand</legend>
+              <legend>Opponent Hand ({ophand.count()})</legend>
               {ophand}
             </fieldset>
           </div>
         </div>
 
         {content}
+        {/*<div>
+      {JSON.stringify(this.state.data.get('cardStates'))}
+        </div>*/}
       </div>
     );
   }

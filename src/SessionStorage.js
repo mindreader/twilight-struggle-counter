@@ -41,7 +41,6 @@ class SessionStorage {
 
   static get = () => {
     try {
-      console.log(["length", sessionStorage.getItem("state").length])
       return JSON.parse(sessionStorage.getItem("state"));
     } catch (e) {
       console.log("Could not store in session storage");

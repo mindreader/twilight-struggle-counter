@@ -1,7 +1,7 @@
 const { Map, Seq } = require("immutable");
 
 class Cards {
-  static cards = () =>
+  static rawCards = () =>
     Map({
       japan: Map({
         name: "us / japan pact",
@@ -742,7 +742,15 @@ class Cards {
         event: true,
         side: "us",
         ops: 3
-      })
+      }),
+      abm: Map({
+        name: "ABM treaty",
+        mid: true,
+        event: false,
+        side: "neutral",
+        ops: 4
+      }),
+
     });
   static cardRanking = () =>
     Seq([
@@ -823,7 +831,6 @@ class Cards {
       "korw",
       "nass",
       "trum",
-      "bw",
       "mp",
       "nato",
       "nord",
@@ -847,6 +854,8 @@ class Cards {
       "decol",
       "japan",
       "block",
+      "bw",
+      "abm",
       "rsp",
       "mes",
       "eu",
@@ -856,14 +865,23 @@ class Cards {
       "warg"
     ]);
 
+  cardRegions = () => Map({
+    "sa": null,
+    "ca": null,
+    "af": null,
+    "eu": null,
+    "as": null,
+    "sea": null,
+  })
+
   // console.log(Seq([1,2,3]).reduce((c,n) => n, 0))
-  static cardsWithImportance = () =>
+  static cards = () =>
     Cards.cardRanking().reduce(
       (accum, card) => [
         accum[0] + 1,
         accum[1].setIn([card, "importance"], accum[0])
       ],
-      [1, Cards.cards()]
+      [1, Cards.rawCards()]
     )[1];
 }
 export default Cards;
