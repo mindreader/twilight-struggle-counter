@@ -53,29 +53,6 @@ class App extends Component {
     else return "TODO"
   }
 
-  redeal(card) {
-//    if (this.props.presence != 'removed' && this.state.presence != 'inhand') {
-//      this.state.presence = 'deck';
-//    }
-  }
-
-  cardClicked(card) {
-    console.log("clicked!")
-    console.log(card)
-//    if (this.state.presence == 'inhand') {
-//      this.setState({
-//        presence: 'discarded'
-//      })
-//    }
-//    else if (this.state.presence == 'discarded' && this.props.card.event) {
-//      this.setState({
-//        presence: 'removed'
-//      })
-//    }
-  }
-
-
-
   constructor(props) {
     super(props)
 
