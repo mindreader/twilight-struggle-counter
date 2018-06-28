@@ -59,7 +59,11 @@ div.handselected > fieldset {
 }
 
 #removed i.remove, #discarded i.discard {
-  display: none
+  display: none;
+}
+
+i.hidden {
+  visibility: hidden;
 }
 
 .star {

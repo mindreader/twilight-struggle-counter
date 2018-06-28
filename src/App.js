@@ -11,8 +11,7 @@ const { Map, fromJS } = require("immutable");
 // card count
 
 class Card extends Component {
-  render() {
-    // TODO get rid of style attribute
+  render = () => {
     return (
       <li
         className="card"
@@ -23,7 +22,7 @@ class Card extends Component {
         }}
       >
         <i
-          className={["remove fas fa-ban"].concat(this.props.event ? [] : ["hidden"]).join(" ")}
+          className={"remove fas fa-ban" + (this.props.event ? "" : " hidden")}
           onClick={e => {
             e.stopPropagation();
             this.props.onRemove(this.props.id);
@@ -154,7 +153,6 @@ class App extends Component {
           : this.allCards.getIn([card, "side"]) === "us"
             ? "blue"
             : "purple";
-        return "black";
       default:
         return "black";
     }
@@ -248,9 +246,8 @@ class App extends Component {
       });
   };
 
-  renderCard = (k, c) => {
-    const pres = this.state.data.getIn(["cardStates", k, "presence"]);
-    return (
+  renderCard = (k, c) =>
+    (
       <Card
         key={k}
         id={k}
@@ -259,13 +256,11 @@ class App extends Component {
         event={c.get("event")}
         name={c.get("name")}
         color={this.cardColor(k)}
-        hidden={pres === "removed"}
         onToHand={this.toHandCard}
         onDiscard={this.discardCard}
         onRemove={this.removeCard}
       />
     );
-  };
 
   renderByRegion() {
     const cards = this.cards();
