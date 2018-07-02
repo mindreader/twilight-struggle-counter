@@ -300,7 +300,7 @@ class App extends Component {
         .filter(cfilter)
         .filter((c, k) => {
           const pres = this.state.data.getIn(["cardStates", k, "presence"]);
-          return pres !== "inhand" && pres !== "ophand" && pres !== "discarded";
+          return pres !== "inhand" && pres !== "ophand" && pres !== "discarded" && pres !== "removed";
         })
         .map((c, k) => this.renderCard(k, c))
         .toList();
@@ -310,7 +310,8 @@ class App extends Component {
     let ussr = f(c => c.get("side") === "ussr");
 
     return (
-      <div className="byside">
+      <fieldset className="byside">
+        <legend align="center">deck</legend>
         <div className="cardCol">
           <fieldset>
             <legend align="center">us</legend>
@@ -329,7 +330,7 @@ class App extends Component {
             <ul>{ussr}</ul>
           </fieldset>
         </div>
-      </div>
+      </fieldset>
     );
   }
 
@@ -346,7 +347,8 @@ class App extends Component {
     const removes = keep("removed")
 
     return (
-      <div className="discardpile">
+      <fieldset className="discardpile">
+        <legend align="center">gone</legend>
         <div id="discarded" className="cardCol">
           <fieldset>
             <legend align="center">discard</legend>
@@ -359,7 +361,7 @@ class App extends Component {
             <ul>{removes}</ul>
           </fieldset>
         </div>
-      </div>
+      </fieldset>
     );
   };
 
@@ -458,9 +460,12 @@ class App extends Component {
             </fieldset>
           </div>
         </div>
-
-        {content}
-        <div>{this.renderDiscardRemoved()}</div>
+        <div class="collapseedges">
+          {content}
+        </div>
+        <div class="collapseedges">
+          {this.renderDiscardRemoved()}
+        </div>
         {/*<div>
       {JSON.stringify(this.state.data.get('cardStates'))}
         </div>*/}

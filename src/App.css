@@ -1,20 +1,23 @@
-acard, .hand, .hand > fieldset > legend {
+body {
   -webkit-user-select: none; /* webkit (safari, chrome) browsers */
   -moz-user-select: none; /* mozilla browsers */
   -khtml-user-select: none; /* webkit (konqueror) browsers */
   -ms-user-select: none; /* IE10+ */
 }
+
+.collapseedges {
+  display: flex;
+  justify-content: center;
+}
 .byside,
 .bywar,
 .discardpile {
-  display: flex;
+  display: inline-flex;
   justify-content: center;
-  margin: 0 auto;
-  max-width: 80%;
 }
 
 .cardCol, .hand {
-  display: inline-block;
+/*  display: inline-block; */
   padding: 5px;
 }
 
