@@ -73,7 +73,7 @@ class Cards {
         mid: true,
         event: false,
         side: "neutral",
-        ops: 2
+        ops: 3
       }),
       willy: Map({
         name: "willy brandt",
@@ -178,7 +178,7 @@ class Cards {
         early: true,
         event: true,
         side: "neutral",
-        ops: 2
+        ops: 1
       }),
       trum: Map({
         name: "truman doctrine",
@@ -496,8 +496,8 @@ class Cards {
         side: "us",
         ops: 1
       }),
-      saddat: Map({
-        name: "saddat expels soviets",
+      sadat: Map({
+        name: "sadat expels soviets",
         mid: true,
         event: true,
         side: "us",
@@ -811,7 +811,7 @@ class Cards {
       "pupp",
       "nixon",
       "oas",
-      "saddat",
+      "sadat",
       "panam",
       "salt",
       "terror",
@@ -904,7 +904,7 @@ class Cards {
         "jp2",
         "sprel"
       ]),
-      me: Set(["mesc", "aiwar", "opec", "camp", "saddat", "voa", "hostage", "shutt", "awacs", "musrev", "nass"]),
+      me: Set(["mesc", "aiwar", "opec", "camp", "sadat", "voa", "hostage", "shutt", "awacs", "musrev", "nass"]),
       as: Set(["assc", "viet", "kwar", "ipwar", "japan", "decol", "form", "voa", "marine", "shutt"]),
       sea: Set(["seasc", "viet", "decol", "colrg", "voa", "ussu"]),
       sa: Set(["sasc", "junta", "allend", "panam", "oas", "voa", "ussu", "allpro", "ladc"]),
