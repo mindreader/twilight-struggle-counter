@@ -391,17 +391,20 @@ class App extends Component {
     ));
 
     return (
-      <div className="byregion">
-        <div className="collapseedges">{content}</div>
+      <div className="collapseedges">
+        <fieldset className="byregion">
+          <legend align="center">deck</legend>
+          {content}
+        </fieldset>
       </div>
     );
   }
 
   renderBySide() {
     const cards = this.cards();
-    const f = cfilter =>
+    const f = side =>
       cards
-        .filter(cfilter)
+        .filter(c => c.get("side") === side)
         .filter((c, k) => {
           const pres = this.state.data.getIn(["cardStates", k, "presence"]);
           return pres !== "inhand" && pres !== "ophand" && pres !== "discarded" && pres !== "removed";
@@ -409,9 +412,9 @@ class App extends Component {
         .map((c, k) => this.renderCard(k, c))
         .toList();
 
-    let us = f(c => c.get("side") === "us");
-    let neutral = f(c => c.get("side") === "neutral");
-    let ussr = f(c => c.get("side") === "ussr");
+    let us = f("us");
+    let neutral = f("neutral");
+    let ussr = f("ussr");
 
     return (
       <div className="collapseedges">
@@ -530,7 +533,7 @@ class App extends Component {
             checked={this.state.data.get("shortCardNames")}
             onChange={this.toggleCardNames}
           />
-          <label for="shortnames">short card names</label>
+          <label for="shortnames">short names</label>
         </div>
 
         <div className={["buttons"].join(" ")}>
