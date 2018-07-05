@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import "./App.css";
 import Cards from "./Cards.js";
 import SessionStorage from "./SessionStorage.js";
+import { detect } from 'detect-browser'
 
 const { Map, fromJS } = require("immutable");
 
@@ -140,18 +141,25 @@ class App extends Component {
   cardColor(card) {
     switch (this.state.data.getIn(["cardStates", card, "presence"])) {
       case "discarded":
-      case "deck":
-      case "inhand":
-      case "ophand":
-      case "removed":
-        return this.allCards.getIn([card, "side"]) === "ussr"
-          ? "red"
-          : this.allCards.getIn([card, "side"]) === "us"
-            ? "blue"
-            : "purple";
-      default:
-        return "black";
+        case "deck":
+        case "inhand":
+        case "ophand":
+        case "removed":
+          return this.allCards.getIn([card, "side"]) === "ussr"
+            ? "red"
+            : this.allCards.getIn([card, "side"]) === "us"
+              ? "blue"
+              : "purple";
+        default:
+          return "black";
+      }
     }
+
+  deckContainer = (legend, cl, content) => {
+    if (this.browser.name === "firefox")
+      return <fieldset align="center" className={cl}><legend>{legend}</legend>{content}</fieldset>
+    else
+      return <div className={cl}>{content}</div>
   }
 
   nextPhaseLabel = () => {
@@ -179,6 +187,7 @@ class App extends Component {
   constructor(props) {
     super(props);
 
+    this.browser = detect()
     this.storage = SessionStorage.storageAvailable("sessionStorage");
 
     this.sorts = ["name", "importance", "ops"];
@@ -287,7 +296,7 @@ class App extends Component {
     />
   );
 
-  renderByMisc() {
+  renderByCategory() {
     // TODO this and top of renderByRegion are complete copy paste
     const cards = this.cards();
     const regInfo = Cards.cardRegions(
@@ -329,18 +338,16 @@ class App extends Component {
 
     const content = [suicide, defconimpr, defcondegr, badcarddisc, warcards, china, cardstealers].map(
       ({ cat, data }) => (
-        <fieldset className="cardCol">
+        <fieldset key={cat} className="cardCol">
           <legend align="center">{cat}</legend>
           <ul>{data}</ul>
         </fieldset>
       )
     );
     return (
+
       <div className="collapseedges">
-        <fieldset className="bycategory">
-          <legend align="center">deck</legend>
-          {content}
-        </fieldset>
+          {this.deckContainer("deck", "bycategory", content)}
       </div>
     );
   }
@@ -384,7 +391,7 @@ class App extends Component {
     let sa = { region: "south america", data: f("sa") };
     let ca = { region: "central america", data: f("ca") };
     const content = [eu, mid, asia, sea, afr, sa, ca].map(({ region, data }) => (
-      <fieldset className="cardCol">
+      <fieldset key={region} className="cardCol">
         <legend align="center">{region}</legend>
         <ul>{data}</ul>
       </fieldset>
@@ -392,10 +399,7 @@ class App extends Component {
 
     return (
       <div className="collapseedges">
-        <fieldset className="byregion">
-          <legend align="center">deck</legend>
-          {content}
-        </fieldset>
+          {this.deckContainer("deck", "byregion", content)}
       </div>
     );
   }
@@ -412,33 +416,22 @@ class App extends Component {
         .map((c, k) => this.renderCard(k, c))
         .toList();
 
-    let us = f("us");
-    let neutral = f("neutral");
-    let ussr = f("ussr");
+    const us = {side: "us", data: f("us")}
+    const neutral = {side: "neutral", data: f("neutral")}
+    const ussr = {side: "ussr", data: f("ussr")}
+
+    const content = [us,neutral,ussr].map(({side, data}) =>
+          <div key={side} className="cardCol">
+            <fieldset>
+              <legend align="center">{side}</legend>
+              <ul>{data}</ul>
+            </fieldset>
+          </div>
+    )
 
     return (
       <div className="collapseedges">
-        <fieldset className="byside">
-          <legend align="center">deck</legend>
-          <div className="cardCol">
-            <fieldset>
-              <legend align="center">us</legend>
-              <ul>{us}</ul>
-            </fieldset>
-          </div>
-          <div className="cardCol">
-            <fieldset>
-              <legend align="center">neutral</legend>
-              <ul>{neutral}</ul>
-            </fieldset>
-          </div>
-          <div className="cardCol">
-            <fieldset>
-              <legend align="center">ussr</legend>
-              <ul>{ussr}</ul>
-            </fieldset>
-          </div>
-        </fieldset>
+          {this.deckContainer("deck", "byside", content)}
       </div>
     );
   }
@@ -455,26 +448,18 @@ class App extends Component {
     const discards = keep("discarded");
     const removes = keep("removed");
 
-    return (
-      <fieldset className="discardpile">
-        <legend align="center">gone</legend>
-        <div id="discarded" className="cardCol">
+    const content = [{name: "discarded", data: discards},{name: "removed", data: removes}].map( c =>
+        <div key={c.name} id={c.name} className="cardCol">
           <fieldset>
-            <legend align="center">discard</legend>
-            <ul>{discards}</ul>
+            <legend align="center">{c.name}</legend>
+            <ul>{c.data}</ul>
           </fieldset>
         </div>
-        <div id="removed" className="cardCol">
-          <fieldset>
-            <legend align="center">removed</legend>
-            <ul>{removes}</ul>
-          </fieldset>
-        </div>
-      </fieldset>
-    );
+    )
+    return this.deckContainer("gone", "discardpile", content)
   };
 
-  render() {
+  render = () => {
     let content = null;
     switch (this.state.data.get("viewBy")) {
       case "region":
@@ -482,7 +467,7 @@ class App extends Component {
         break;
 
       case "category":
-        content = this.renderByMisc();
+        content = this.renderByCategory();
         break;
 
       case "byside":
@@ -533,7 +518,7 @@ class App extends Component {
             checked={this.state.data.get("shortCardNames")}
             onChange={this.toggleCardNames}
           />
-          <label for="shortnames">short names</label>
+          <label htmlFor="shortnames">short names</label>
         </div>
 
         <div className={["buttons"].join(" ")}>

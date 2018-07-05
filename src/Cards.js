@@ -131,14 +131,14 @@ class Cards {
         side: "ussr",
         ops: 1
       }),
-      korw: Map({
+      kwar: Map({
         name: "korean war",
         early: true,
         event: true,
         side: "ussr",
         ops: 2
       }),
-      arisw: Map({
+      aiwar: Map({
         name: "arab-israeli war",
         early: true,
         event: false,
@@ -195,7 +195,7 @@ class Cards {
         side: "us",
         ops: 4
       }),
-      indopw: Map({
+      ipwar: Map({
         name: "indo-pakistani war",
         early: true,
         event: false,
@@ -384,7 +384,7 @@ class Cards {
         side: "ussr",
         ops: 2
       }),
-      all: Map({
+      allend: Map({
         name: "allende",
         mid: true,
         event: true,
@@ -433,7 +433,7 @@ class Cards {
         side: "ussr",
         ops: 1
       }),
-      crg: Map({
+      colrg: Map({
         name: "colonial rear guards",
         mid: true,
         event: false,
@@ -788,14 +788,14 @@ class Cards {
       "armsr",
       "cubmc",
       "howil",
-      "indopw",
+      "ipwar",
       "un",
       "brez",
       "hostage",
       "warsaw",
       "marine",
       "portu",
-      "arisw",
+      "aiwar",
       "camb",
       "ortega",
       "fidel",
@@ -828,7 +828,7 @@ class Cards {
       "suez",
       "quag",
       "safrun",
-      "korw",
+      "kwar",
       "nass",
       "trum",
       "mp",
@@ -839,7 +839,7 @@ class Cards {
       "def",
       "voa",
       "gsales",
-      "crg",
+      "colrg",
       "sasc",
       "afsc",
       "casc",
@@ -849,7 +849,7 @@ class Cards {
       "refo",
       "aldr",
       "lib",
-      "all",
+      "allend",
       "destal",
       "decol",
       "japan",
@@ -877,8 +877,8 @@ class Cards {
       // cards that are commonly used to degrade the defcon by the US to prevent bad card from leaving
       defconincreasers: Set(["howil", "cubmc", "gsales"]),
       // cards capable of ditching score cards.
-      badcarddiscarders: Set(["asknot","fyp"]),
-      warcards: Set(["iiw","arisw", "indopw", "bw", "korw"]),
+      badcarddiscarders: Set(["asknot","fyp","aldr"]),
+      warcards: Set(["iiw","aiwar", "ipwar", "bw", "kwar"]),
       // china card stealers
       china: Set(["nixon", "cult", "ussu"]),
       // card stealers / discarders you should be aware of
@@ -887,17 +887,17 @@ class Cards {
       // these cards could theoretically affect any region at any time when if headlined.
       all: Set(["destal", "bw", "nsubs", "abm", "pupp", "cam"]),
       eu: Set(["eusc", "socgov", "block", "romabd", "come", "warsaw", "degau", "trum","ireds", "mp", "suez", "eeunr", "willy", "voa", "refo", "tdtw", "persh", "jp2", "sprel"]),
-      me: Set(["mesc", "arisw", "opec", "camp", "saddat", "voa", "hostage", "shutt", "awacs", "musrev", "nass"]),
-      as: Set(["assc","viet", "korw", "indopw", "japan", "decol", "form", "voa", "marine", "shutt"]),
-      sea: Set(["seasc", "viet", "decol","crg", "voa", "ussu"]),
-      sa: Set(["sasc", "junta", "all", "panam", "oas", "voa", "ussu", "allpro", "ladc"]),
+      me: Set(["mesc", "aiwar", "opec", "camp", "saddat", "voa", "hostage", "shutt", "awacs", "musrev", "nass"]),
+      as: Set(["assc","viet", "kwar", "ipwar", "japan", "decol", "form", "voa", "marine", "shutt"]),
+      sea: Set(["seasc", "viet", "decol","colrg", "voa", "ussu"]),
+      sa: Set(["sasc", "junta", "allend", "panam", "oas", "voa", "ussu", "allpro", "ladc"]),
       ca: Set(["casc", "fidel", "junta", "panam", "oas", "voa", "lib", "ironl", "ortega"]),
-      af: Set(["afsc", "decol", "portu", "crg", "voa"]),
+      af: Set(["afsc", "decol", "portu", "colrg", "voa"]),
     })
 
     if (cardsRemoved.has("jp2")) { cards = cards.updateIn(["eu"], s => s.add("solid")) }
     if (cardsRemoved.has("awacs")) { cards = cards.updateIn(["me"], s => s.remove("musrev")) }
-    if (cardsRemoved.has("camp")) { cards = cards.updateIn(["me"], s => s.remove("arisw")) }
+    if (cardsRemoved.has("camp")) { cards = cards.updateIn(["me"], s => s.remove("aiwar")) }
 
     // cambridge five in late war
     if (phase === 3) cards = cards.updateIn(["all"], s => s.remove("cam"))
