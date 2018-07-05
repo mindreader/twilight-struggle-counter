@@ -1,4 +1,4 @@
-const { Map, Seq } = require("immutable");
+const { Map, Seq, Set } = require("immutable");
 
 class Cards {
   static rawCards = () =>
@@ -10,28 +10,28 @@ class Cards {
         side: "us",
         ops: 4
       }),
-      asia: Map({
+      assc: Map({
         name: "asia scoring",
         early: true,
         event: false,
         side: "neutral",
         scoringcard: true
       }),
-      eu: Map({
+      eusc: Map({
         name: "europe scoring",
         early: true,
         event: false,
         side: "neutral",
         scoringcard: true
       }),
-      mes: Map({
+      mesc: Map({
         name: "middle east scoring",
         early: true,
         event: false,
         side: "neutral",
         scoringcard: true
       }),
-      sea: Map({
+      seasc: Map({
         key: "sea",
         name: "southeast asia scoring",
         mid: true,
@@ -223,7 +223,7 @@ class Cards {
         side: "ussr",
         ops: 3
       }),
-      eeu: Map({
+      eeunr: Map({
         name: "east european unrest",
         early: true,
         event: false,
@@ -272,7 +272,7 @@ class Cards {
         side: "us",
         ops: 2
       }),
-      cent: Map({
+      casc: Map({
         name: "central american scoring",
         mid: true,
         event: false,
@@ -370,7 +370,7 @@ class Cards {
         side: "ussr",
         ops: 3
       }),
-      port: Map({
+      portu: Map({
         name: "portuguese empire crumbles",
         mid: true,
         event: true,
@@ -482,7 +482,7 @@ class Cards {
         side: "neutral",
         ops: 2
       }),
-      nix: Map({
+      nixon: Map({
         name: "nixon plays the china card",
         mid: true,
         event: true,
@@ -531,7 +531,7 @@ class Cards {
         side: "us",
         ops: 3
       }),
-      ask: Map({
+      asknot: Map({
         name: "ask not what your country...",
         mid: true,
         event: true,
@@ -545,21 +545,21 @@ class Cards {
         side: "us",
         ops: 3
       }),
-      afr: Map({
-        name: "african scoring",
+      afsc: Map({
+        name: "africa scoring",
         mid: true,
         event: false,
         side: "neutral",
         scoringcard: true
       }),
-      one: Map({
+      onest: Map({
         name: "one small step",
         mid: true,
         event: false,
         side: "neutral",
         ops: 2
       }),
-      soam: Map({
+      sasc: Map({
         name: "south america scoring",
         mid: true,
         event: false,
@@ -636,7 +636,7 @@ class Cards {
         side: "ussr",
         ops: 2
       }),
-      terr: Map({
+      terror: Map({
         name: "terrorism",
         late: true,
         event: false,
@@ -720,7 +720,7 @@ class Cards {
         side: "ussr",
         ops: 2
       }),
-      specr: Map({
+      sprel: Map({
         name: "special relationship",
         early: true,
         event: false,
@@ -736,7 +736,7 @@ class Cards {
         side: "us",
         ops: 2
       }),
-      awac: Map({
+      awacs: Map({
         name: "awacs sale to saudis",
         late: true,
         event: true,
@@ -762,11 +762,11 @@ class Cards {
       "ironl",
       "norsea",
       "evil",
-      "awac",
-      "eeu",
+      "awacs",
+      "eeunr",
       "shutt",
       "reagan",
-      "one",
+      "onest",
       "cns",
       "iiw",
       "lads",
@@ -784,7 +784,7 @@ class Cards {
       "form",
       "solid",
       "tehran",
-      "specr",
+      "sprel",
       "armsr",
       "cubmc",
       "howil",
@@ -794,28 +794,28 @@ class Cards {
       "hostage",
       "warsaw",
       "marine",
-      "port",
+      "portu",
       "arisw",
       "camb",
       "ortega",
       "fidel",
       "allpro",
       "d&c",
-      "sea",
+      "seasc",
       "kal",
       "tdtw",
-      "ask",
+      "asknot",
       "chern",
       "fyp",
       "sw",
       "nsubs",
       "pupp",
-      "nix",
+      "nixon",
       "oas",
       "saddat",
       "panam",
       "salt",
-      "terr",
+      "terror",
       "misenv",
       "flowr",
       "musrev",
@@ -840,9 +840,9 @@ class Cards {
       "voa",
       "gsales",
       "crg",
-      "soam",
-      "afr",
-      "cent",
+      "sasc",
+      "afsc",
+      "casc",
       "ntb",
       "junta",
       "wwby",
@@ -857,24 +857,62 @@ class Cards {
       "bw",
       "abm",
       "rsp",
-      "mes",
-      "eu",
-      "asia",
+      "mesc",
+      "eusc",
+      "assc",
       "lone",
       "cia",
       "warg"
     ]);
 
-  cardRegions = () => Map({
-    "sa": null,
-    "ca": null,
-    "af": null,
-    "eu": null,
-    "as": null,
-    "sea": null,
-  })
 
-  // console.log(Seq([1,2,3]).reduce((c,n) => n, 0))
+  // List of cards to watch out for in regions which which they effect.
+  static cardRegions = (cardsRemoved, validStarWarsTargets, phase) => {
+
+    let cards = Map({
+      // we aren't including ones no one will play like olympic games or summit.
+      suicide: Set(["cia", "lone", "d&c", "wwby", "ortega", "kal", "gsales"]),
+      // cards that are commonly used to improve the defcon to get rid of a bad card
+      defconimprovers: Set(["salt", "howil", "ntb"]),
+      // cards that are commonly used to degrade the defcon by the US to prevent bad card from leaving
+      defconincreasers: Set(["howil", "cubmc", "gsales"]),
+      // cards capable of ditching score cards.
+      badcarddiscarders: Set(["asknot","fyp"]),
+      warcards: Set(["iiw","arisw", "indopw", "bw", "korw"]),
+      // china card stealers
+      china: Set(["nixon", "cult", "ussu"]),
+      // card stealers / discarders you should be aware of
+      cardstealers: Set(["gsales", "misenv", "aldr", "fyp", "block", "terror"]),
+
+      // these cards could theoretically affect any region at any time when if headlined.
+      all: Set(["destal", "bw", "nsubs", "abm", "pupp", "cam"]),
+      eu: Set(["eusc", "socgov", "block", "romabd", "come", "warsaw", "degau", "trum","ireds", "mp", "suez", "eeunr", "willy", "voa", "refo", "tdtw", "persh", "jp2", "sprel"]),
+      me: Set(["mesc", "arisw", "opec", "camp", "saddat", "voa", "hostage", "shutt", "awacs", "musrev", "nass"]),
+      as: Set(["assc","viet", "korw", "indopw", "japan", "decol", "form", "voa", "marine", "shutt"]),
+      sea: Set(["seasc", "viet", "decol","crg", "voa", "ussu"]),
+      sa: Set(["sasc", "junta", "all", "panam", "oas", "voa", "ussu", "allpro", "ladc"]),
+      ca: Set(["casc", "fidel", "junta", "panam", "oas", "voa", "lib", "ironl", "ortega"]),
+      af: Set(["afsc", "decol", "portu", "crg", "voa"]),
+    })
+
+    if (cardsRemoved.has("jp2")) { cards = cards.updateIn(["eu"], s => s.add("solid")) }
+    if (cardsRemoved.has("awacs")) { cards = cards.updateIn(["me"], s => s.remove("musrev")) }
+    if (cardsRemoved.has("camp")) { cards = cards.updateIn(["me"], s => s.remove("arisw")) }
+
+    // cambridge five in late war
+    if (phase === 3) cards = cards.updateIn(["all"], s => s.remove("cam"))
+
+    // star wars, add to all categories
+    if (phase === 3) {
+      cards = cards.map((s,cat) => {
+        const add =  validStarWarsTargets.reduce((accum,card) => s.has(card) ? true : accum, false)
+        return add ? s.add("sw") : s
+      })
+    }
+
+    return cards
+  }
+
   static cards = () =>
     Cards.cardRanking().reduce(
       (accum, card) => [

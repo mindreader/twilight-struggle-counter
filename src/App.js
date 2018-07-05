@@ -15,7 +15,7 @@ class Card extends Component {
     return (
       <li
         className="card"
-        style={{color: this.props.color}}
+        style={{ color: this.props.color }}
         onClick={e => {
           e.stopPropagation();
           this.props.onToHand(this.props.id);
@@ -35,35 +35,37 @@ class Card extends Component {
             this.props.onDiscard(this.props.id);
           }}
         />
-        {this.props.ops == null ? <i className="score fas fa-star-half-alt"/> : "\u00A0" + this.props.ops} {this.props.name}
+        {this.props.ops == null ? <i className="score fas fa-star-half-alt" /> : "\u00A0" + this.props.ops}{" "}
+        {this.props.name}
       </li>
     );
-  }
+  };
 }
 
 class App extends Component {
   appSaveState = f => this.setState(({ data }) => ({ data: SessionStorage.set(f(data)) }));
+  appNoSaveState = f => this.setState(({ data }) => ({ data: f(data) }));
 
   changePhase = () => this.appSaveState(st => st.update("phase", p => (p < 3 ? p + 1 : 1)).set("lastState", st));
 
-  toggleDiscards = () => this.appSaveState(st => st.update("showDiscards", d => !d));
+  toggleCardNames = () => this.appNoSaveState(st => st.update("shortCardNames", old => !old));
 
   toggleUSSR = () =>
-    this.appSaveState(st => st.update("ussrSelected", oldside => (oldside !== "ussr" ? "ussr" : null)));
+    this.appNoSaveState(st => st.update("ussrSelected", oldside => (oldside !== "ussr" ? "ussr" : null)));
 
   setSort = event => {
     const ns = event.target.value;
-    this.appSaveState(st => st.set("sortBy", ns));
+    this.appNoSaveState(st => st.set("sortBy", ns));
   };
 
   setFilter = event => {
     const nf = event.target.value;
-    this.appSaveState(st => st.set("filterBy", nf));
+    this.appNoSaveState(st => st.set("filterBy", nf));
   };
 
   setView = event => {
     const nv = event.target.value;
-    this.appSaveState(st => st.set("viewBy", nv));
+    this.appNoSaveState(st => st.set("viewBy", nv));
   };
 
   reset = () =>
@@ -72,7 +74,7 @@ class App extends Component {
         .set("sortBy", st.get("sortBy"))
         .set("filterBy", st.get("filterBy"))
         .set("viewBy", st.get("viewBy"))
-        .set("ussrSelected", st.get("ussrSelected"))
+        .set("shortCardNames", st.get("shortCardNames"))
     );
 
   undo = () =>
@@ -85,15 +87,9 @@ class App extends Component {
               .set("sortBy", st.get("sortBy"))
               .set("filterBy", st.get("filterBy"))
               .set("viewBy", st.get("viewBy"))
+              .set("shortCardNames", st.get("shortCardNames"))
               .set("ussrSelected", st.get("ussrSelected"))
     );
-
-  /*  fix =  () => {
-    this.appSaveState(st =>
-      st.setIn(['cardStates', 'abm', 'presence'], "deck")
-    )
-    console.log(this.state.data.getIn(['cardStates','abm']).toJS())
-  } */
 
   addDiscards = () => {
     this.appSaveState(st =>
@@ -124,15 +120,15 @@ class App extends Component {
   cardClicked = card =>
     this.appSaveState(st => {
       st.updateIn(["cardStates", card, "presence"], presence => {
-        const event = this.allCards.getIn([card, "event"]);
         switch (presence) {
           case "deck":
             return "inhand";
           case "inhand":
+            return "ophand";
           case "ophand":
-            return "discarded";
+            return "inhand";
           case "discarded":
-            return event ? "removed" : presence;
+            return this.allCards.getIn([card, "event"]) ? "removed" : presence;
           default:
             return presence;
         }
@@ -170,12 +166,13 @@ class App extends Component {
   static initialState = allCards =>
     Map({
       cardStates: allCards.map(c => Map({ presence: "deck" })),
-      viewBy: "byside", // war / importance / byside
-      sortBy: "importance", // ops / name / importance
-      filterBy: "none", // none / scoring / 2ops / 3ops / 4ops / high priority
+      viewBy: "byside",
+      sortBy: "importance",
+      filterBy: "all",
       showDiscards: true,
       phase: 1, // 1 = early, 2 = mid, 3 = late
       ussrSelected: null,
+      shortCardNames: false,
       lastState: null
     });
 
@@ -185,9 +182,21 @@ class App extends Component {
     this.storage = SessionStorage.storageAvailable("sessionStorage");
 
     this.sorts = ["name", "importance", "ops"];
-    // TODO filter by affects region
-    this.filters = ["none", "mostimportant", "scoring", "nonscoring", "2ops", "3ops", "4ops"];
-    this.views = ["region", "byside"];
+    this.filters = [
+      "all",
+      "most important 15",
+      "scoring",
+      "us",
+      "ussr",
+      "neutral",
+      "us or neutral",
+      "ussr or neutral",
+      "nonscoring",
+      "2ops+",
+      "3ops+",
+      "4ops+"
+    ];
+    this.views = ["byside", "region", "category"];
 
     this.allCards = Cards.cards();
 
@@ -205,13 +214,20 @@ class App extends Component {
 
   cards = () => {
     let c = this.allCards.filter(c => this.phaseFilter(c));
-    if (this.state.data.get("filterBy") === "mostimportant") {
-      c = c.sortBy(c => Cards.cardRanking().size - c.get("importance")).take(15);
+    // TODO filter by most important that are not "gone"
+    if (this.state.data.get("filterBy") === "most important 15") {
+      c = c
+        .filter((c, k) => {
+          const pres = this.state.data.getIn(["cardStates", k, "presence"]);
+          return pres !== "removed" && pres !== "discarded" && pres !== "inhand" && pres !== "gone";
+        })
+        .sortBy(c => Cards.cardRanking().size - c.get("importance"))
+        .take(15);
     }
     return c
       .sortBy(c => {
         switch (this.state.data.get("sortBy")) {
-          case "none":
+          case "all":
             return 0;
           case "ops":
             return c.get("ops") ? 5 - c.get("ops") : 0;
@@ -230,12 +246,22 @@ class App extends Component {
             return c.get("scoringcard");
           case "nonscoring":
             return !c.get("scoringcard");
-          case "2ops":
+          case "2ops+":
             return c.get("ops") >= 2;
-          case "3ops":
+          case "3ops+":
             return c.get("ops") >= 3;
-          case "4ops":
+          case "4ops+":
             return c.get("ops") >= 4;
+          case "us":
+            return c.get("side") === "us";
+          case "ussr":
+            return c.get("side") === "ussr";
+          case "neutral":
+            return c.get("side") === "neutral";
+          case "us or neutral":
+            return c.get("side") === "neutral" || c.get("side") === "us";
+          case "ussr or neutral":
+            return c.get("side") === "neutral" || c.get("side") === "ussr";
           default:
             return true;
         }
@@ -246,49 +272,127 @@ class App extends Component {
       });
   };
 
-  renderCard = (k, c) =>
-    (
-      <Card
-        key={k}
-        id={k}
-        side={c.get("side")}
-        ops={c.get("ops")}
-        event={c.get("event")}
-        name={c.get("name")}
-        color={this.cardColor(k)}
-        onToHand={this.toHandCard}
-        onDiscard={this.discardCard}
-        onRemove={this.removeCard}
-      />
+  renderCard = (k, c) => (
+    <Card
+      key={k}
+      id={k}
+      side={c.get("side")}
+      ops={c.get("ops")}
+      event={c.get("event")}
+      name={this.state.data.get("shortCardNames") ? k : c.get("name")}
+      color={this.cardColor(k)}
+      onToHand={this.toHandCard}
+      onDiscard={this.discardCard}
+      onRemove={this.removeCard}
+    />
+  );
+
+  renderByMisc() {
+    // TODO this and top of renderByRegion are complete copy paste
+    const cards = this.cards();
+    const regInfo = Cards.cardRegions(
+      this.state.data
+        .get("cardStates")
+        .filter(c => c.get("presence") === "removed")
+        .keySeq()
+        .toSet(),
+      this.state.data
+        .get("cardStates")
+        .filter(
+          (c, k) =>
+            c.get("presence") === "discarded" &&
+            this.allCards.getIn([k, "side"]) !== "ussr" &&
+            !this.allCards.getIn([k, "scoringcard"])
+        )
+        .keySeq()
+        .toSet(),
+      this.state.data.get("phase")
     );
 
-  renderByRegion() {
-    const cards = this.cards();
-    const f = cfilter =>
+    const f = category =>
       cards
-        .filter(cfilter)
+        .filter((c, k) => regInfo.get(category).has(k))
         .filter((c, k) => {
           const pres = this.state.data.getIn(["cardStates", k, "presence"]);
-          return pres !== "inhand" && pres !== "ophand";
+          return pres === "deck";
         })
         .map((c, k) => this.renderCard(k, c))
         .toList();
 
-    let early = f(c => c.get("early"));
-    let mid = f(c => c.get("mid"));
-    let late = f(c => c.get("late"));
+    const suicide = { cat: "suicide", data: f("suicide") };
+    const defconimpr = { cat: "defcon improve", data: f("defconimprovers") };
+    const defcondegr = { cat: "hl defcon degrade", data: f("defconincreasers") };
+    const badcarddisc = { cat: "bad card discard", data: f("badcarddiscarders") };
+    const warcards = { cat: "war cards", data: f("warcards") };
+    const china = { cat: "china card", data: f("china") };
+    const cardstealers = { cat: "card stealers", data: f("cardstealers") };
+
+    const content = [suicide, defconimpr, defcondegr, badcarddisc, warcards, china, cardstealers].map(
+      ({ cat, data }) => (
+        <fieldset className="cardCol">
+          <legend align="center">{cat}</legend>
+          <ul>{data}</ul>
+        </fieldset>
+      )
+    );
+    return (
+      <div className="collapseedges">
+        <fieldset className="bycategory">
+          <legend align="center">deck</legend>
+          {content}
+        </fieldset>
+      </div>
+    );
+  }
+
+  renderByRegion() {
+    const cards = this.cards();
+    const regInfo = Cards.cardRegions(
+      this.state.data
+        .get("cardStates")
+        .filter(c => c.get("presence") === "removed")
+        .keySeq()
+        .toSet(),
+      this.state.data
+        .get("cardStates")
+        .filter(
+          (c, k) =>
+            c.get("presence") === "discarded" &&
+            this.allCards.getIn([k, "side"]) !== "ussr" &&
+            !this.allCards.getIn([k, "scoringcard"])
+        )
+        .keySeq()
+        .toSet(),
+      this.state.data.get("phase")
+    );
+
+    const f = region =>
+      cards
+        .filter((c, k) => regInfo.get(region).has(k) || regInfo.get("all").has(k))
+        .filter((c, k) => {
+          const pres = this.state.data.getIn(["cardStates", k, "presence"]);
+          return pres === "deck";
+        })
+        .map((c, k) => this.renderCard(k, c))
+        .toList();
+
+    let eu = { region: "europe", data: f("eu") };
+    let mid = { region: "middle east", data: f("me") };
+    let asia = { region: "asia", data: f("as") };
+    let sea = { region: "south east asia", data: f("sea") };
+    let afr = { region: "africa", data: f("af") };
+    let sa = { region: "south america", data: f("sa") };
+    let ca = { region: "central america", data: f("ca") };
+    const content = [eu, mid, asia, sea, afr, sa, ca].map(({ region, data }) => (
+      <fieldset className="cardCol">
+        <legend align="center">{region}</legend>
+        <ul>{data}</ul>
+      </fieldset>
+    ));
 
     return (
       <div className="byregion">
-        <div className="cardCol">
-          <ul>{late}</ul>
-        </div>
-        <div className="cardCol">
-          <ul>{mid}</ul>
-        </div>
-        <div className="cardCol">
-          <ul>{early}</ul>
-        </div>
+        <div className="collapseedges">{content}</div>
       </div>
     );
   }
@@ -310,41 +414,43 @@ class App extends Component {
     let ussr = f(c => c.get("side") === "ussr");
 
     return (
-      <fieldset className="byside">
-        <legend align="center">deck</legend>
-        <div className="cardCol">
-          <fieldset>
-            <legend align="center">us</legend>
-            <ul>{us}</ul>
-          </fieldset>
-        </div>
-        <div className="cardCol">
-          <fieldset>
-            <legend align="center">neutral</legend>
-            <ul>{neutral}</ul>
-          </fieldset>
-        </div>
-        <div className="cardCol">
-          <fieldset>
-            <legend align="center">ussr</legend>
-            <ul>{ussr}</ul>
-          </fieldset>
-        </div>
-      </fieldset>
+      <div className="collapseedges">
+        <fieldset className="byside">
+          <legend align="center">deck</legend>
+          <div className="cardCol">
+            <fieldset>
+              <legend align="center">us</legend>
+              <ul>{us}</ul>
+            </fieldset>
+          </div>
+          <div className="cardCol">
+            <fieldset>
+              <legend align="center">neutral</legend>
+              <ul>{neutral}</ul>
+            </fieldset>
+          </div>
+          <div className="cardCol">
+            <fieldset>
+              <legend align="center">ussr</legend>
+              <ul>{ussr}</ul>
+            </fieldset>
+          </div>
+        </fieldset>
+      </div>
     );
   }
 
   renderDiscardRemoved = () => {
+    const keep = pres =>
+      this.cards()
+        .filter((c, k) => {
+          return this.state.data.getIn(["cardStates", k, "presence"]) === pres;
+        })
+        .map((c, k) => this.renderCard(k, c))
+        .toList();
 
-    const keep = (pres) => this.cards()
-      .filter((c, k) => {
-        return this.state.data.getIn(["cardStates", k, "presence"]) === pres;
-      })
-      .map((c, k) => this.renderCard(k, c))
-      .toList();
-
-    const discards = keep("discarded")
-    const removes = keep("removed")
+    const discards = keep("discarded");
+    const removes = keep("removed");
 
     return (
       <fieldset className="discardpile">
@@ -371,6 +477,11 @@ class App extends Component {
       case "region":
         content = this.renderByRegion();
         break;
+
+      case "category":
+        content = this.renderByMisc();
+        break;
+
       case "byside":
         content = this.renderBySide();
         break;
@@ -413,6 +524,13 @@ class App extends Component {
           <button className={this.nextPhaseVisibility() ? [] : ["hidden"]} onClick={() => this.changePhase()}>
             {this.nextPhaseLabel()}
           </button>
+          <input
+            id="shortnames"
+            type="checkbox"
+            checked={this.state.data.get("shortCardNames")}
+            onChange={this.toggleCardNames}
+          />
+          <label for="shortnames">short card names</label>
         </div>
 
         <div className={["buttons"].join(" ")}>
@@ -437,9 +555,6 @@ class App extends Component {
           <button disabled={!this.state.data.get("lastState")} onClick={this.undo}>
             undo
           </button>
-          {/* <label>
-            show discarded<input type="checkbox" onChange={this.toggleDiscards} />
-          </label> */}
         </div>
         <div className="bothhands">
           <div className="hand lefthand" onClick={this.toggleUSSR}>
@@ -448,11 +563,14 @@ class App extends Component {
               <ul>{yourhand}</ul>
             </fieldset>
           </div>
+          <i
+            className={"fas " + (this.state.data.get("ussrSelected") ? "fa-arrow-right" : "fa-arrow-left")}
+            onClick={this.toggleUSSR}
+          />
           <div
             className={["hand", "righthand"]
               .concat(this.state.data.get("ussrSelected") === "ussr" ? ["handselected"] : [])
               .join(" ")}
-            onClick={this.toggleUSSR}
           >
             <fieldset>
               <legend>Opponent Hand ({ophand.count()})</legend>
@@ -460,12 +578,8 @@ class App extends Component {
             </fieldset>
           </div>
         </div>
-        <div class="collapseedges">
-          {content}
-        </div>
-        <div class="collapseedges">
-          {this.renderDiscardRemoved()}
-        </div>
+        <span>{content}</span>
+        <div className="collapseedges">{this.renderDiscardRemoved()}</div>
         {/*<div>
       {JSON.stringify(this.state.data.get('cardStates'))}
         </div>*/}

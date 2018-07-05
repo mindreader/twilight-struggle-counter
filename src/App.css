@@ -10,10 +10,23 @@ body {
   justify-content: center;
 }
 .byside,
-.bywar,
+.byregion,
+.bycategory,
 .discardpile {
   display: inline-flex;
+  flex-wrap: wrap;
   justify-content: center;
+}
+
+
+
+/* center the us / ussr arrow vertically */
+i.fa-arrow-left, i.fa-arrow-right {
+  margin-top: 20px;
+}
+
+i.fa-arrow-right {
+  color: red;
 }
 
 .cardCol, .hand {
