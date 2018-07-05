@@ -20,5 +20,6 @@
   },
   "prettier": {
     "printWidth": 120
-  }
+  },
+  "homepage": "."
 }
