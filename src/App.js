@@ -156,8 +156,10 @@ class App extends Component {
     }
 
   deckContainer = (legend, cl, content) => {
+
+    // Firefox can style fieldsets with flex display.  Looks great, but unfortunately nothing else can.
     if (this.browser.name === "firefox")
-      return <fieldset align="center" className={cl}><legend>{legend}</legend>{content}</fieldset>
+      return <fieldset className={cl}><legend align="center">{legend}</legend>{content}</fieldset>
     else
       return <div className={cl}>{content}</div>
   }
@@ -448,7 +450,7 @@ class App extends Component {
     const discards = keep("discarded");
     const removes = keep("removed");
 
-    const content = [{name: "discarded", data: discards},{name: "removed", data: removes}].map( c =>
+    const content = [{name: "removed", data: removes}, {name: "discarded", data: discards}].map( c =>
         <div key={c.name} id={c.name} className="cardCol">
           <fieldset>
             <legend align="center">{c.name}</legend>
