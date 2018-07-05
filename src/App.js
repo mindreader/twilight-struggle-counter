@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import "./App.css";
 import Cards from "./Cards.js";
 import SessionStorage from "./SessionStorage.js";
-import { detect } from 'detect-browser'
+import { detect } from "detect-browser";
 
 const { Map, fromJS } = require("immutable");
 
@@ -141,28 +141,31 @@ class App extends Component {
   cardColor(card) {
     switch (this.state.data.getIn(["cardStates", card, "presence"])) {
       case "discarded":
-        case "deck":
-        case "inhand":
-        case "ophand":
-        case "removed":
-          return this.allCards.getIn([card, "side"]) === "ussr"
-            ? "red"
-            : this.allCards.getIn([card, "side"]) === "us"
-              ? "blue"
-              : "purple";
-        default:
-          return "black";
-      }
+      case "deck":
+      case "inhand":
+      case "ophand":
+      case "removed":
+        return this.allCards.getIn([card, "side"]) === "ussr"
+          ? "red"
+          : this.allCards.getIn([card, "side"]) === "us"
+            ? "blue"
+            : "purple";
+      default:
+        return "black";
     }
+  }
 
   deckContainer = (legend, cl, content) => {
-
     // Firefox can style fieldsets with flex display.  Looks great, but unfortunately nothing else can.
     if (this.browser.name === "firefox")
-      return <fieldset className={cl}><legend align="center">{legend}</legend>{content}</fieldset>
-    else
-      return <div className={cl}>{content}</div>
-  }
+      return (
+        <fieldset className={cl}>
+          <legend align="center">{legend}</legend>
+          {content}
+        </fieldset>
+      );
+    else return <div className={cl}>{content}</div>;
+  };
 
   nextPhaseLabel = () => {
     switch (this.state.data.get("phase")) {
@@ -189,7 +192,7 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.browser = detect()
+    this.browser = detect();
     this.storage = SessionStorage.storageAvailable("sessionStorage");
 
     this.sorts = ["name", "importance", "ops"];
@@ -346,12 +349,7 @@ class App extends Component {
         </fieldset>
       )
     );
-    return (
-
-      <div className="collapseedges">
-          {this.deckContainer("deck", "bycategory", content)}
-      </div>
-    );
+    return <div className="collapseedges">{this.deckContainer("deck", "bycategory", content)}</div>;
   }
 
   renderByRegion() {
@@ -399,11 +397,7 @@ class App extends Component {
       </fieldset>
     ));
 
-    return (
-      <div className="collapseedges">
-          {this.deckContainer("deck", "byregion", content)}
-      </div>
-    );
+    return <div className="collapseedges">{this.deckContainer("deck", "byregion", content)}</div>;
   }
 
   renderBySide() {
@@ -418,24 +412,20 @@ class App extends Component {
         .map((c, k) => this.renderCard(k, c))
         .toList();
 
-    const us = {side: "us", data: f("us")}
-    const neutral = {side: "neutral", data: f("neutral")}
-    const ussr = {side: "ussr", data: f("ussr")}
+    const us = { side: "us", data: f("us") };
+    const neutral = { side: "neutral", data: f("neutral") };
+    const ussr = { side: "ussr", data: f("ussr") };
 
-    const content = [us,neutral,ussr].map(({side, data}) =>
-          <div key={side} className="cardCol">
-            <fieldset>
-              <legend align="center">{side}</legend>
-              <ul>{data}</ul>
-            </fieldset>
-          </div>
-    )
-
-    return (
-      <div className="collapseedges">
-          {this.deckContainer("deck", "byside", content)}
+    const content = [us, neutral, ussr].map(({ side, data }) => (
+      <div key={side} className="cardCol">
+        <fieldset>
+          <legend align="center">{side}</legend>
+          <ul>{data}</ul>
+        </fieldset>
       </div>
-    );
+    ));
+
+    return <div className="collapseedges">{this.deckContainer("deck", "byside", content)}</div>;
   }
 
   renderDiscardRemoved = () => {
@@ -450,15 +440,15 @@ class App extends Component {
     const discards = keep("discarded");
     const removes = keep("removed");
 
-    const content = [{name: "removed", data: removes}, {name: "discarded", data: discards}].map( c =>
-        <div key={c.name} id={c.name} className="cardCol">
-          <fieldset>
-            <legend align="center">{c.name}</legend>
-            <ul>{c.data}</ul>
-          </fieldset>
-        </div>
-    )
-    return this.deckContainer("gone", "discardpile", content)
+    const content = [{ name: "removed", data: removes }, { name: "discarded", data: discards }].map(c => (
+      <div key={c.name} id={c.name} className="cardCol">
+        <fieldset>
+          <legend align="center">{c.name}</legend>
+          <ul>{c.data}</ul>
+        </fieldset>
+      </div>
+    ));
+    return this.deckContainer("gone", "discardpile", content);
   };
 
   render = () => {
@@ -547,7 +537,7 @@ class App extends Component {
           </button>
         </div>
         <div className="bothhands">
-          <div className="hand lefthand" onClick={this.toggleUSSR}>
+          <div className="hand lefthand">
             <fieldset>
               <legend>Your Hand ({yourhand.count()})</legend>
               <ul>{yourhand}</ul>
@@ -575,7 +565,7 @@ class App extends Component {
         </div>*/}
       </div>
     );
-  }
+  };
 }
 
 export default App;

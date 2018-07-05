@@ -749,8 +749,7 @@ class Cards {
         event: false,
         side: "neutral",
         ops: 4
-      }),
-
+      })
     });
   static cardRanking = () =>
     Seq([
@@ -865,10 +864,8 @@ class Cards {
       "warg"
     ]);
 
-
   // List of cards to watch out for in regions which which they effect.
   static cardRegions = (cardsRemoved, validStarWarsTargets, phase) => {
-
     let cards = Map({
       // we aren't including ones no one will play like olympic games or summit.
       suicide: Set(["cia", "lone", "d&c", "wwby", "ortega", "kal", "gsales"]),
@@ -877,8 +874,8 @@ class Cards {
       // cards that are commonly used to degrade the defcon by the US to prevent bad card from leaving
       defconincreasers: Set(["howil", "cubmc", "gsales"]),
       // cards capable of ditching score cards.
-      badcarddiscarders: Set(["asknot","fyp","aldr"]),
-      warcards: Set(["iiw","aiwar", "ipwar", "bw", "kwar"]),
+      badcarddiscarders: Set(["asknot", "fyp", "aldr"]),
+      warcards: Set(["iiw", "aiwar", "ipwar", "bw", "kwar"]),
       // china card stealers
       china: Set(["nixon", "cult", "ussu"]),
       // card stealers / discarders you should be aware of
@@ -886,40 +883,63 @@ class Cards {
 
       // these cards could theoretically affect any region at any time when if headlined.
       all: Set(["destal", "bw", "nsubs", "abm", "pupp", "cam"]),
-      eu: Set(["eusc", "socgov", "block", "romabd", "come", "warsaw", "degau", "trum","ireds", "mp", "suez", "eeunr", "willy", "voa", "refo", "tdtw", "persh", "jp2", "sprel"]),
+      eu: Set([
+        "eusc",
+        "socgov",
+        "block",
+        "romabd",
+        "come",
+        "warsaw",
+        "degau",
+        "trum",
+        "ireds",
+        "mp",
+        "suez",
+        "eeunr",
+        "willy",
+        "voa",
+        "refo",
+        "tdtw",
+        "persh",
+        "jp2",
+        "sprel"
+      ]),
       me: Set(["mesc", "aiwar", "opec", "camp", "saddat", "voa", "hostage", "shutt", "awacs", "musrev", "nass"]),
-      as: Set(["assc","viet", "kwar", "ipwar", "japan", "decol", "form", "voa", "marine", "shutt"]),
-      sea: Set(["seasc", "viet", "decol","colrg", "voa", "ussu"]),
+      as: Set(["assc", "viet", "kwar", "ipwar", "japan", "decol", "form", "voa", "marine", "shutt"]),
+      sea: Set(["seasc", "viet", "decol", "colrg", "voa", "ussu"]),
       sa: Set(["sasc", "junta", "allend", "panam", "oas", "voa", "ussu", "allpro", "ladc"]),
       ca: Set(["casc", "fidel", "junta", "panam", "oas", "voa", "lib", "ironl", "ortega"]),
-      af: Set(["afsc", "decol", "portu", "colrg", "voa"]),
-    })
+      af: Set(["afsc", "decol", "portu", "colrg", "voa"])
+    });
 
-    if (cardsRemoved.has("jp2")) { cards = cards.updateIn(["eu"], s => s.add("solid")) }
-    if (cardsRemoved.has("awacs")) { cards = cards.updateIn(["me"], s => s.remove("musrev")) }
-    if (cardsRemoved.has("camp")) { cards = cards.updateIn(["me"], s => s.remove("aiwar")) }
+    if (cardsRemoved.has("jp2")) {
+      cards = cards.updateIn(["eu"], s => s.add("solid"));
+    }
+    if (cardsRemoved.has("awacs")) {
+      cards = cards.updateIn(["me"], s => s.remove("musrev"));
+    }
+    if (cardsRemoved.has("camp")) {
+      cards = cards.updateIn(["me"], s => s.remove("aiwar"));
+    }
 
     // cambridge five in late war
-    if (phase === 3) cards = cards.updateIn(["all"], s => s.remove("cam"))
+    if (phase === 3) cards = cards.updateIn(["all"], s => s.remove("cam"));
 
     // star wars, add to all categories
     if (phase === 3) {
-      cards = cards.map((s,cat) => {
-        const add =  validStarWarsTargets.reduce((accum,card) => s.has(card) ? true : accum, false)
-        return add ? s.add("sw") : s
-      })
+      cards = cards.map((s, cat) => {
+        const add = validStarWarsTargets.reduce((accum, card) => (s.has(card) ? true : accum), false);
+        return add ? s.add("sw") : s;
+      });
     }
 
-    return cards
-  }
+    return cards;
+  };
 
   static cards = () =>
-    Cards.cardRanking().reduce(
-      (accum, card) => [
-        accum[0] + 1,
-        accum[1].setIn([card, "importance"], accum[0])
-      ],
-      [1, Cards.rawCards()]
-    )[1];
+    Cards.cardRanking().reduce((accum, card) => [accum[0] + 1, accum[1].setIn([card, "importance"], accum[0])], [
+      1,
+      Cards.rawCards()
+    ])[1];
 }
 export default Cards;
