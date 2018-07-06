@@ -19,7 +19,7 @@ class Card extends Component {
         style={{ color: this.props.color }}
         onClick={e => {
           e.stopPropagation();
-          this.props.onToHand(this.props.id);
+          this.props.onNameClick(this.props.id);
         }}
       >
         <i
@@ -112,7 +112,11 @@ class App extends Component {
     );
   };
 
-  toHandCard = card => this.moveCard(card, this.state.data.get("ussrSelected") === "ussr" ? "ophand" : "inhand");
+  onNameClick = card => {
+    const hand = this.state.data.get("ussrSelected") === "ussr" ? "ophand" : "inhand"
+    const pres = this.state.data.getIn(["cardStates", card, "presence"])
+    return this.moveCard(card, pres === "deck" ? hand : "deck")
+  }
   discardCard = card => this.moveCard(card, "discarded");
   removeCard = card => this.moveCard(card, "removed");
 
@@ -295,7 +299,7 @@ class App extends Component {
       event={c.get("event")}
       name={this.state.data.get("shortCardNames") ? k : c.get("name")}
       color={this.cardColor(k)}
-      onToHand={this.toHandCard}
+      onNameClick={this.onNameClick}
       onDiscard={this.discardCard}
       onRemove={this.removeCard}
     />
