@@ -498,43 +498,45 @@ class App extends Component {
 
     return (
       <div className="App">
-        <div className={["buttons"].join(" ")}>
-          <button onClick={() => this.reset()}>reset</button>
-          <button onClick={() => this.addDiscards()}>readd discards</button>
-          <button className={this.nextPhaseVisibility() ? [] : ["hidden"]} onClick={() => this.changePhase()}>
-            {this.nextPhaseLabel()}
-          </button>
-          <input
-            id="shortnames"
-            type="checkbox"
-            checked={this.state.data.get("shortCardNames")}
-            onChange={this.toggleCardNames}
-          />
-          <label htmlFor="shortnames">short names</label>
-        </div>
+        <div className="buttons">
+          <div>
+            <button onClick={() => this.reset()}>reset</button>
+            <button title="Note: cards in deck will be moved to opponent's hand" onClick={() => this.addDiscards()}>readd discards</button>
+            <button className={this.nextPhaseVisibility() ? [] : ["hidden"]} onClick={() => this.changePhase()}>
+              {this.nextPhaseLabel()}
+            </button>
+            <input
+              id="shortnames"
+              type="checkbox"
+              checked={this.state.data.get("shortCardNames")}
+              onChange={this.toggleCardNames}
+            />
+            <label htmlFor="shortnames">short names</label>
+          </div>
 
-        <div className={["buttons"].join(" ")}>
-          <label>
-            view:
-            <select value={this.state.data.get("viewBy")} onChange={this.setView}>
-              {viewOptions}
-            </select>
-          </label>
-          <label>
-            sort:
-            <select value={this.state.data.get("sortBy")} onChange={this.setSort}>
-              {sortOptions}
-            </select>
-          </label>
-          <label>
-            filter:
-            <select value={this.state.data.get("filterBy")} onChange={this.setFilter}>
-              {filterOptions}
-            </select>
-          </label>
-          <button disabled={!this.state.data.get("lastState")} onClick={this.undo}>
-            undo
-          </button>
+          <div>
+            <label>
+              view:
+              <select value={this.state.data.get("viewBy")} onChange={this.setView}>
+                {viewOptions}
+              </select>
+            </label>
+            <label>
+              sort:
+              <select value={this.state.data.get("sortBy")} onChange={this.setSort}>
+                {sortOptions}
+              </select>
+            </label>
+            <label>
+              filter:
+              <select value={this.state.data.get("filterBy")} onChange={this.setFilter}>
+                {filterOptions}
+              </select>
+            </label>
+            <button disabled={!this.state.data.get("lastState")} onClick={this.undo}>
+              undo
+            </button>
+          </div>
         </div>
         <div className="bothhands">
           <div className="hand lefthand">

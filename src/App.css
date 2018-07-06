@@ -34,20 +34,21 @@ i.fa-arrow-right {
   padding: 5px;
 }
 
-.bothhands, .buttons {
+.bothhands {
   display: flex;
   justify-content: center;
-  margin: 0 auto;
-  max-width: 80%;
 }
 
-.buttons > * {
+div.buttons > div {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+div.buttons > div > * {
   margin: 2px;
 }
 
-.buttons {
-  width: 50%;
-}
 ul {
   padding: 0px;
   list-style-type: none;
