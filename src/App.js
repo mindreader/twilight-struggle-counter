@@ -264,14 +264,14 @@ class App extends Component {
             else if (score1) return -1;
             else if (score2) return 1;
 
-            // sides - ussr -> us -> neutral
+            // sides - us -> ussr -> neutral
             const side1 = c1.get("side");
             const side2 = c2.get("side");
             if (side1 !== side2) {
-              if (side1 === "ussr") return -1;
-              else if (side2 === "ussr") return 1;
-              else if (side1 === "us") return -1;
+              if (side1 === "us") return -1;
               else if (side2 === "us") return 1;
+              else if (side1 === "ussr") return -1;
+              else if (side2 === "ussr") return 1;
             }
 
             // all else equal, sort by ops ascending
