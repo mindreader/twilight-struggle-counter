@@ -43,6 +43,9 @@ class Card extends Component {
   };
 }
 
+// wish immutable would just export this.
+const defaultComparator = (a, b) => (a > b ? 1 : a < b ? -1 : 0);
+
 class App extends Component {
   appSaveState = f => this.setState(({ data }) => ({ data: SessionStorage.set(f(data)) }));
   appNoSaveState = f => this.setState(({ data }) => ({ data: f(data) }));
@@ -113,10 +116,10 @@ class App extends Component {
   };
 
   onNameClick = card => {
-    const hand = this.state.data.get("ussrSelected") === "ussr" ? "ophand" : "inhand"
-    const pres = this.state.data.getIn(["cardStates", card, "presence"])
-    return this.moveCard(card, pres === "deck" ? hand : "deck")
-  }
+    const hand = this.state.data.get("ussrSelected") === "ussr" ? "ophand" : "inhand";
+    const pres = this.state.data.getIn(["cardStates", card, "presence"]);
+    return this.moveCard(card, pres === "deck" ? hand : "deck");
+  };
   discardCard = card => this.moveCard(card, "discarded");
   removeCard = card => this.moveCard(card, "removed");
 
@@ -199,7 +202,7 @@ class App extends Component {
     this.browser = detect();
     this.storage = SessionStorage.storageAvailable("sessionStorage");
 
-    this.sorts = ["name", "importance", "ops"];
+    this.sorts = ["name", "importance", "ops", "playdek"];
     this.filters = [
       "all",
       "most important 15",
@@ -243,17 +246,41 @@ class App extends Component {
         .take(15);
     }
     return c
-      .sortBy(c => {
+      .sort((c1, c2) => {
         switch (this.state.data.get("sortBy")) {
           case "all":
             return 0;
           case "ops":
-            return c.get("ops") ? 5 - c.get("ops") : 0;
+            return defaultComparator(c2.get("ops"), c1.get("ops"));
           case "name":
-            return c.get("name");
+            return defaultComparator(c1.get("name").toLowerCase(), c2.get("name").toLowerCase());
           case "importance":
-            return Cards.cardRanking().size - c.get("importance");
+            return defaultComparator(c2.get("importance"), c1.get("importance"));
+          case "playdek":
+            // scoring cards first
+            const score1 = c1.get("scoringcard");
+            const score2 = c2.get("scoringcard");
+            if ((score1 === score2) === null) return 0;
+            else if (score1) return -1;
+            else if (score2) return 1;
 
+            // sides - ussr -> us -> neutral
+            const side1 = c1.get("side");
+            const side2 = c2.get("side");
+            if (side1 !== side2) {
+              if (side1 === "ussr") return -1;
+              else if (side2 === "ussr") return 1;
+              else if (side1 === "us") return -1;
+              else if (side2 === "us") return 1;
+            }
+
+            // all else equal, sort by ops ascending
+            const ops = defaultComparator(c1.get("ops"), c2.get("ops"));
+            if (ops !== 0) return ops;
+
+            // playdek doesn't actually sort by name, but I don't see any
+            // consistent way to break ties.
+            return defaultComparator(c1.get("name").toLowerCase(), c2.get("name").toLowerCase());
           default:
             return c.get("name");
         }
@@ -505,7 +532,9 @@ class App extends Component {
         <div className="buttons">
           <div>
             <button onClick={() => this.reset()}>reset</button>
-            <button title="Note: cards in deck will be moved to opponent's hand" onClick={() => this.addDiscards()}>readd discards</button>
+            <button title="Note: cards in deck will be moved to opponent's hand" onClick={() => this.addDiscards()}>
+              readd discards
+            </button>
             <button className={this.nextPhaseVisibility() ? [] : ["hidden"]} onClick={() => this.changePhase()}>
               {this.nextPhaseLabel()}
             </button>
