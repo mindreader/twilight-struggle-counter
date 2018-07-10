@@ -54,7 +54,13 @@ ul {
   list-style-type: none;
 }
 
-button.hidden {
+#savebutton, #loadbutton {
+  padding: 2px;
+  font-weight: bold;
+  border: 1px solid black;
+}
+
+button.hidden, input.hidden {
   display: none;
 }
 

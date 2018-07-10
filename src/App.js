@@ -3,6 +3,7 @@ import "./App.css";
 import Cards from "./Cards.js";
 import SessionStorage from "./SessionStorage.js";
 import { detect } from "detect-browser";
+import { Download, Load } from "./Save.js"
 
 const { Map, fromJS } = require("immutable");
 
@@ -531,6 +532,13 @@ class App extends Component {
       <div className="App">
         <div className="buttons">
           <div>
+            <label id="savebutton" htmlFor="myfile" >Load Game</label>
+
+            <input onChange={(event) => Load.load(event.target.files, js => this.appSaveState(() => fromJS(js)))
+            } className="hidden" id="myfile" name="files[]" type="file"/>
+
+            <label id="loadbutton" htmlFor="save" onClick={() => Download.download(this.state.data.update("lastState", () => null))}>Save Game</label>
+
             <button onClick={() => this.reset()}>reset</button>
             <button title="Note: cards in deck will be moved to opponent's hand" onClick={() => this.addDiscards()}>
               readd discards
