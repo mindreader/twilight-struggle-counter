@@ -728,7 +728,7 @@ class Cards {
         ops: 2
       }),
       nord: Map({ name: "norad", early: true, event: true, side: "us", ops: 3 }),
-      che: Map({ name: "che", mid: true, event: true, side: "ussr", ops: 3 }),
+      che: Map({ name: "che", mid: true, event: false, side: "ussr", ops: 3 }),
       tehran: Map({
         name: "our man in tehran",
         mid: true,
