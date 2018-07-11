@@ -753,6 +753,7 @@ class Cards {
     });
   static cardRanking = () =>
     Seq([
+      "summ",
       "ireds",
       "romabd",
       "olymp",
@@ -770,7 +771,6 @@ class Cards {
       "iiw",
       "lads",
       "ladc",
-      "summ",
       "come",
       "persh",
       "u2",
