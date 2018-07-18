@@ -475,7 +475,7 @@ class App extends Component {
     const content = [{ name: "removed", data: removes }, { name: "discarded", data: discards }].map(c => (
       <div key={c.name} id={c.name} className="cardCol">
         <fieldset>
-          <legend align="center">{c.name}</legend>
+          <legend align="center">{c.name} ({c.data.count()})</legend>
           <ul>{c.data}</ul>
         </fieldset>
       </div>
