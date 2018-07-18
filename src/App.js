@@ -16,8 +16,7 @@ class Card extends Component {
   render = () => {
     return (
       <li
-        className="card"
-        style={{ color: this.props.color }}
+        className={"card " + this.props.side}
         onClick={e => {
           e.stopPropagation();
           this.props.onNameClick(this.props.id);
@@ -145,23 +144,6 @@ class App extends Component {
     });
 
   nextPhaseVisibility = () => this.state.data.get("phase") < 3;
-
-  cardColor(card) {
-    switch (this.state.data.getIn(["cardStates", card, "presence"])) {
-      case "discarded":
-      case "deck":
-      case "inhand":
-      case "ophand":
-      case "removed":
-        return this.allCards.getIn([card, "side"]) === "ussr"
-          ? "red"
-          : this.allCards.getIn([card, "side"]) === "us"
-            ? "blue"
-            : "purple";
-      default:
-        return "black";
-    }
-  }
 
   deckContainer = (legend, cl, content) => {
     // Firefox can style fieldsets with flex display.  Looks great, but unfortunately nothing else can.
@@ -326,7 +308,6 @@ class App extends Component {
       ops={c.get("ops")}
       event={c.get("event")}
       name={this.state.data.get("shortCardNames") ? k : c.get("name")}
-      color={this.cardColor(k)}
       onNameClick={this.onNameClick}
       onDiscard={this.discardCard}
       onRemove={this.removeCard}

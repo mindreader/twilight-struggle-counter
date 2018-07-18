@@ -80,6 +80,35 @@ div.handselected > fieldset {
 .hand .toophand {
   display: none;
 }
+i.remove:hover, i.discard:hover {
+  color: #111;
+}
+
+li.card:hover {
+  color: yellow;
+}
+li.card.us {
+  color: #0000FF;
+}
+
+li.card.ussr {
+  color: #FF0000;
+}
+
+li.card.neutral {
+  color: #800080;
+}
+
+li.card.us:hover {
+  color: #5555FF;
+}
+li.card.ussr:hover {
+  color: #FF5555;
+}
+li.card.neutral:hover {
+  color: #E000E0;
+}
+
 
 #removed i.remove, #discarded i.discard {
   display: none;
