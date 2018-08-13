@@ -644,7 +644,7 @@ class Cards {
         ops: 2
       }),
       contra: Map({
-        name: "iron-contra scandal",
+        name: "iran-contra scandal",
         late: true,
         event: true,
         side: "ussr",
