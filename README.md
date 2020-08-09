@@ -35,3 +35,7 @@ Sometimes it is convenient to filter by some criteria.  "All" will show all card
 
 # Issues
 If you find any bugs or have any suggestions, file an issue here on github and I'll take a look.
+
+# Translations
+
+Chinese - Much thanks to Boying Chenthu for this this translation.
