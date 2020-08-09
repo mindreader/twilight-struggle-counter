@@ -175,7 +175,7 @@ class App extends Component {
 
   static initialState = allCards =>
     Map({
-      language: "cn",
+      language: "en",
       cardStates: allCards.map(c => Map({ presence: "deck" })),
       viewBy: "byside",
       sortBy: "importance",
