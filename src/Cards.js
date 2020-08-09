@@ -5,6 +5,7 @@ class Cards {
     Map({
       japan: Map({
         name: "us / japan pact",
+        cn: "美日共同防卫协定",
         early: true,
         event: true,
         side: "us",
@@ -12,6 +13,7 @@ class Cards {
       }),
       assc: Map({
         name: "asia scoring",
+        cn: "亚洲计分",
         early: true,
         event: false,
         side: "neutral",
@@ -19,6 +21,7 @@ class Cards {
       }),
       eusc: Map({
         name: "europe scoring",
+        cn: "欧洲计分",
         early: true,
         event: false,
         side: "neutral",
@@ -26,14 +29,15 @@ class Cards {
       }),
       mesc: Map({
         name: "middle east scoring",
+        cn: "中东计分",
         early: true,
         event: false,
         side: "neutral",
         scoringcard: true
       }),
       seasc: Map({
-        key: "sea",
         name: "southeast asia scoring",
+        cn: "东南亚计分",
         mid: true,
         event: true,
         side: "neutral",
@@ -41,6 +45,7 @@ class Cards {
       }),
       romabd: Map({
         name: "romanian abdication",
+        cn: "罗马尼亚颠覆",
         early: true,
         event: true,
         side: "ussr",
@@ -48,6 +53,7 @@ class Cards {
       }),
       ireds: Map({
         name: "independent reds",
+        cn: "独立的红色",
         early: true,
         event: true,
         side: "us",
@@ -55,14 +61,15 @@ class Cards {
       }),
       olymp: Map({
         name: "olympic games",
+        cn: "奥利匹克运动会",
         early: true,
         event: false,
         side: "neutral",
         ops: 2
       }),
       rsp: Map({
-        key: "rsp",
         name: "redscare / purge",
+        cn: "红色恐怖/清洗",
         early: true,
         event: false,
         side: "neutral",
@@ -70,6 +77,7 @@ class Cards {
       }),
       bw: Map({
         name: "brush war",
+        cn: "局部战争",
         mid: true,
         event: false,
         side: "neutral",
@@ -77,6 +85,7 @@ class Cards {
       }),
       willy: Map({
         name: "willy brandt",
+        cn: "德国总统维利·勃兰特",
         mid: true,
         event: true,
         side: "ussr",
@@ -84,6 +93,7 @@ class Cards {
       }),
       "d&c": Map({
         name: "duck and cover",
+        cn: "躲避与掩护",
         early: true,
         event: false,
         side: "us",
@@ -91,6 +101,7 @@ class Cards {
       }),
       fyp: Map({
         name: "five year plan",
+        cn: "五年计划",
         early: true,
         event: false,
         side: "us",
@@ -98,6 +109,7 @@ class Cards {
       }),
       socgov: Map({
         name: "socialist governments",
+        cn: "社会主义政府",
         early: true,
         event: false,
         side: "ussr",
@@ -105,6 +117,7 @@ class Cards {
       }),
       yuri: Map({
         name: "yuri & samantha",
+        cn: "尤里和萨曼莎",
         late: true,
         event: true,
         side: "ussr",
@@ -112,6 +125,7 @@ class Cards {
       }),
       fidel: Map({
         name: "fidel",
+        cn: "菲德尔·卡斯特罗",
         early: true,
         event: true,
         side: "ussr",
@@ -119,6 +133,7 @@ class Cards {
       }),
       viet: Map({
         name: "vietnam revolts",
+        cn: "越南起义",
         early: true,
         event: true,
         side: "ussr",
@@ -126,6 +141,7 @@ class Cards {
       }),
       block: Map({
         name: "blockade",
+        cn: "封锁",
         early: true,
         event: true,
         side: "ussr",
@@ -133,13 +149,15 @@ class Cards {
       }),
       kwar: Map({
         name: "korean war",
+        cn: "朝鲜战争",
         early: true,
         event: true,
         side: "ussr",
         ops: 2
       }),
       aiwar: Map({
-        name: "arab-israeli war",
+        name: "arabisraeli war",
+        cn: "阿以战争",
         early: true,
         event: false,
         side: "ussr",
@@ -147,6 +165,7 @@ class Cards {
       }),
       come: Map({
         name: "comecon",
+        cn: "经济互助委员会",
         early: true,
         event: true,
         side: "ussr",
@@ -154,6 +173,7 @@ class Cards {
       }),
       nass: Map({
         name: "nasser",
+        cn: "埃及总统纳赛尔",
         early: true,
         event: true,
         side: "ussr",
@@ -161,6 +181,7 @@ class Cards {
       }),
       warsaw: Map({
         name: "warsaw pact formed",
+        cn: "华沙条约组织成立",
         early: true,
         event: true,
         side: "ussr",
@@ -168,6 +189,7 @@ class Cards {
       }),
       degau: Map({
         name: "degaulle leads france",
+        cn: "戴高乐领导法国",
         early: true,
         event: true,
         side: "ussr",
@@ -175,6 +197,7 @@ class Cards {
       }),
       cns: Map({
         name: "captured nazi scientist",
+        cn: "逮捕纳粹科学家",
         early: true,
         event: true,
         side: "neutral",
@@ -182,14 +205,16 @@ class Cards {
       }),
       trum: Map({
         name: "truman doctrine",
+        cn: "杜鲁门主义",
         early: true,
         event: true,
         side: "us",
         ops: 1
       }),
-      nato: Map({ name: "nato", early: true, event: true, side: "us", ops: 4 }),
+      nato: Map({ name: "nato", cn: "北大西洋公约组织", early: true, event: true, side: "us", ops: 4 }),
       mp: Map({
         name: "marshall plan",
+        cn: "马歇尔计划",
         early: true,
         event: true,
         side: "us",
@@ -197,6 +222,7 @@ class Cards {
       }),
       ipwar: Map({
         name: "indo-pakistani war",
+        cn: "印巴战争",
         early: true,
         event: false,
         side: "neutral",
@@ -204,6 +230,7 @@ class Cards {
       }),
       cont: Map({
         name: "containment",
+        cn: "遏制政策",
         early: true,
         event: true,
         side: "us",
@@ -211,6 +238,7 @@ class Cards {
       }),
       cia: Map({
         name: "cia created",
+        cn: "建立中情局",
         early: true,
         event: true,
         side: "us",
@@ -218,6 +246,7 @@ class Cards {
       }),
       suez: Map({
         name: "suez crisis",
+        cn: "苏伊士运河危机",
         early: true,
         event: true,
         side: "ussr",
@@ -225,6 +254,7 @@ class Cards {
       }),
       eeunr: Map({
         name: "east european unrest",
+        cn: "东欧剧变",
         early: true,
         event: false,
         side: "us",
@@ -232,6 +262,7 @@ class Cards {
       }),
       decol: Map({
         name: "decolonization",
+        cn: "去殖民地化",
         early: true,
         event: false,
         side: "ussr",
@@ -239,6 +270,7 @@ class Cards {
       }),
       destal: Map({
         name: "destalinization",
+        cn: "去斯大林化",
         early: true,
         event: true,
         side: "ussr",
@@ -246,6 +278,7 @@ class Cards {
       }),
       un: Map({
         name: "un intervention",
+        cn: "联合国干预",
         early: true,
         event: false,
         side: "neutral",
@@ -253,6 +286,7 @@ class Cards {
       }),
       ntb: Map({
         name: "nuclear test ban",
+        cn: "禁止核爆试验",
         early: true,
         event: false,
         side: "neutral",
@@ -260,6 +294,7 @@ class Cards {
       }),
       form: Map({
         name: "formosan resolution",
+        cn: "台湾决议",
         early: true,
         event: true,
         side: "us",
@@ -267,6 +302,7 @@ class Cards {
       }),
       def: Map({
         name: "defectors",
+        cn: "背叛者",
         early: true,
         event: false,
         side: "us",
@@ -274,6 +310,7 @@ class Cards {
       }),
       casc: Map({
         name: "central american scoring",
+        cn: "中美洲计分",
         mid: true,
         event: false,
         side: "neutral",
@@ -281,6 +318,7 @@ class Cards {
       }),
       armsr: Map({
         name: "arms race",
+        cn: "军备竞赛",
         mid: true,
         event: false,
         side: "neutral",
@@ -288,6 +326,7 @@ class Cards {
       }),
       cubmc: Map({
         name: "cuban missile crisis",
+        cn: "古巴导弹危机",
         mid: true,
         event: true,
         side: "neutral",
@@ -295,6 +334,7 @@ class Cards {
       }),
       nsubs: Map({
         name: "nuclear subs",
+        cn: "核潜艇",
         mid: true,
         event: true,
         side: "us",
@@ -302,6 +342,7 @@ class Cards {
       }),
       quag: Map({
         name: "quagmire",
+        cn: "困境",
         mid: true,
         event: true,
         side: "ussr",
@@ -309,6 +350,7 @@ class Cards {
       }),
       salt: Map({
         name: "salt negotiations",
+        cn: "战略武器裁减谈判",
         mid: true,
         event: true,
         side: "neutral",
@@ -316,6 +358,7 @@ class Cards {
       }),
       bear: Map({
         name: "bear trap",
+        cn: "捕熊陷阱",
         mid: true,
         event: true,
         side: "us",
@@ -323,6 +366,7 @@ class Cards {
       }),
       summ: Map({
         name: "summit",
+        cn: "首脑会议",
         mid: true,
         event: false,
         side: "neutral",
@@ -330,6 +374,7 @@ class Cards {
       }),
       howil: Map({
         name: "how i learned to stop worrying",
+        cn: "我如何学会不再担忧",
         mid: true,
         event: true,
         side: "neutral",
@@ -337,6 +382,7 @@ class Cards {
       }),
       junta: Map({
         name: "junta",
+        cn: "军事独裁",
         mid: true,
         event: false,
         side: "neutral",
@@ -344,6 +390,7 @@ class Cards {
       }),
       kitch: Map({
         name: "kitchen debates",
+        cn: "厨房辩论",
         mid: true,
         event: true,
         side: "us",
@@ -351,6 +398,7 @@ class Cards {
       }),
       misenv: Map({
         name: "missile envy",
+        cn: "导弹嫉妒",
         mid: true,
         event: false,
         side: "neutral",
@@ -358,6 +406,7 @@ class Cards {
       }),
       wwby: Map({
         name: "we will bury you",
+        cn: "我们会埋葬你们的",
         mid: true,
         event: true,
         side: "ussr",
@@ -365,6 +414,7 @@ class Cards {
       }),
       brez: Map({
         name: "brezhnev doctrine",
+        cn: "勃列日涅夫主义",
         mid: true,
         event: true,
         side: "ussr",
@@ -372,6 +422,7 @@ class Cards {
       }),
       portu: Map({
         name: "portuguese empire crumbles",
+        cn: "葡萄牙王国崩溃",
         mid: true,
         event: true,
         side: "ussr",
@@ -379,6 +430,7 @@ class Cards {
       }),
       safrun: Map({
         name: "south african unrest",
+        cn: "南非动荡",
         mid: true,
         event: false,
         side: "ussr",
@@ -386,6 +438,7 @@ class Cards {
       }),
       allend: Map({
         name: "allende",
+        cn: "智利总统阿言德",
         mid: true,
         event: true,
         side: "ussr",
@@ -393,6 +446,7 @@ class Cards {
       }),
       musrev: Map({
         name: "muslim revolution",
+        cn: "穆斯林起义",
         mid: true,
         event: false,
         side: "ussr",
@@ -400,6 +454,7 @@ class Cards {
       }),
       cult: Map({
         name: "cultural revolution",
+        cn: "文化大革命",
         mid: true,
         event: true,
         side: "ussr",
@@ -407,6 +462,7 @@ class Cards {
       }),
       flowr: Map({
         name: "flower power",
+        cn: "花朵力量",
         mid: true,
         event: true,
         side: "ussr",
@@ -414,6 +470,7 @@ class Cards {
       }),
       u2: Map({
         name: "U-2 incident",
+        cn: "U-2侦察机事件",
         mid: true,
         event: true,
         side: "ussr",
@@ -421,6 +478,7 @@ class Cards {
       }),
       opec: Map({
         name: "opec",
+        cn: "石油输出国组织",
         mid: true,
         event: false,
         side: "ussr",
@@ -428,6 +486,7 @@ class Cards {
       }),
       lone: Map({
         name: "lone gunman",
+        cn: "独行枪手",
         mid: true,
         event: true,
         side: "ussr",
@@ -435,6 +494,7 @@ class Cards {
       }),
       colrg: Map({
         name: "colonial rear guards",
+        cn: "殖民后卫",
         mid: true,
         event: false,
         side: "us",
@@ -442,6 +502,7 @@ class Cards {
       }),
       panam: Map({
         name: "panama canal returned",
+        cn: "归还巴拿马运河",
         mid: true,
         event: true,
         side: "us",
@@ -449,6 +510,7 @@ class Cards {
       }),
       camp: Map({
         name: "camp david accords",
+        cn: "戴维营协议",
         mid: true,
         event: true,
         side: "us",
@@ -456,6 +518,7 @@ class Cards {
       }),
       pupp: Map({
         name: "puppet governments",
+        cn: "傀儡政府",
         mid: true,
         event: true,
         side: "us",
@@ -463,6 +526,7 @@ class Cards {
       }),
       gsales: Map({
         name: "grain sales to soviets",
+        cn: "向苏联出售谷物",
         mid: true,
         event: false,
         side: "us",
@@ -470,6 +534,7 @@ class Cards {
       }),
       jp2: Map({
         name: "john paul II elected pope",
+        cn: "约翰·保罗二世当选教皇",
         mid: true,
         event: true,
         side: "us",
@@ -477,6 +542,7 @@ class Cards {
       }),
       lads: Map({
         name: "latin american death squads",
+        cn: "拉丁美洲敢死队",
         mid: true,
         event: false,
         side: "neutral",
@@ -484,6 +550,7 @@ class Cards {
       }),
       nixon: Map({
         name: "nixon plays the china card",
+        cn: "尼克松打出中国牌",
         mid: true,
         event: true,
         side: "us",
@@ -491,6 +558,7 @@ class Cards {
       }),
       oas: Map({
         name: "oas founded",
+        cn: "美洲国家组织创立",
         mid: true,
         event: true,
         side: "us",
@@ -498,6 +566,7 @@ class Cards {
       }),
       sadat: Map({
         name: "sadat expels soviets",
+        cn: "埃及总统萨达特驱逐苏维埃",
         mid: true,
         event: true,
         side: "us",
@@ -505,6 +574,7 @@ class Cards {
       }),
       shutt: Map({
         name: "shuttle diplomacy",
+        cn: "穿梭外交",
         mid: true,
         event: true,
         side: "us",
@@ -512,6 +582,7 @@ class Cards {
       }),
       voa: Map({
         name: "voice of america",
+        cn: "美国之音",
         mid: true,
         event: false,
         side: "us",
@@ -519,6 +590,7 @@ class Cards {
       }),
       lib: Map({
         name: "liberation theology",
+        cn: "解放神学",
         mid: true,
         event: false,
         side: "ussr",
@@ -526,6 +598,7 @@ class Cards {
       }),
       ussu: Map({
         name: "ussuri river skirmish",
+        cn: "乌苏里江冲突",
         mid: true,
         event: true,
         side: "us",
@@ -533,6 +606,7 @@ class Cards {
       }),
       asknot: Map({
         name: "ask not what your country...",
+        cn: "不要问你的国家能为你做什么",
         mid: true,
         event: true,
         side: "us",
@@ -540,6 +614,7 @@ class Cards {
       }),
       allpro: Map({
         name: "alliance for progress",
+        cn: "美洲进步同盟",
         mid: true,
         event: true,
         side: "us",
@@ -547,6 +622,7 @@ class Cards {
       }),
       afsc: Map({
         name: "africa scoring",
+        cn: "非洲计分",
         mid: true,
         event: false,
         side: "neutral",
@@ -554,6 +630,7 @@ class Cards {
       }),
       onest: Map({
         name: "one small step",
+        cn: "一小步",
         mid: true,
         event: false,
         side: "neutral",
@@ -561,6 +638,7 @@ class Cards {
       }),
       sasc: Map({
         name: "south america scoring",
+        cn: "南美洲计分",
         mid: true,
         event: false,
         side: "neutral",
@@ -568,6 +646,7 @@ class Cards {
       }),
       hostage: Map({
         name: "iranian hostage crisis",
+        cn: "伊朗人质危机",
         late: true,
         event: true,
         side: "ussr",
@@ -575,6 +654,7 @@ class Cards {
       }),
       ironl: Map({
         name: "the iron lady",
+        cn: "铁娘子",
         late: true,
         event: true,
         side: "us",
@@ -582,6 +662,7 @@ class Cards {
       }),
       reagan: Map({
         name: "reagan bombs libya",
+        cn: "里根轰炸利比亚",
         late: true,
         event: true,
         side: "us",
@@ -589,6 +670,7 @@ class Cards {
       }),
       sw: Map({
         name: "star wars",
+        cn: "星球大战",
         late: true,
         event: true,
         side: "us",
@@ -596,6 +678,7 @@ class Cards {
       }),
       norsea: Map({
         name: "north sea oil",
+        cn: "北海石油",
         late: true,
         event: true,
         side: "us",
@@ -603,6 +686,7 @@ class Cards {
       }),
       refo: Map({
         name: "the reformer",
+        cn: "改革家",
         late: true,
         event: true,
         side: "ussr",
@@ -610,6 +694,7 @@ class Cards {
       }),
       marine: Map({
         name: "marine barracks bombing",
+        cn: "轰炸海军陆战队兵营",
         late: true,
         event: true,
         side: "ussr",
@@ -617,6 +702,7 @@ class Cards {
       }),
       kal: Map({
         name: "soviets shoot down KAL-007",
+        cn: "苏联击落韩国航空公司——007航班",
         late: true,
         event: true,
         side: "us",
@@ -624,6 +710,7 @@ class Cards {
       }),
       glas: Map({
         name: "glasnost",
+        cn: "开放",
         late: true,
         event: true,
         side: "ussr",
@@ -631,6 +718,7 @@ class Cards {
       }),
       ortega: Map({
         name: "ortega elected in nicaragua",
+        cn: "奥特加当选尼加拉瓜总统",
         late: true,
         event: true,
         side: "ussr",
@@ -638,6 +726,7 @@ class Cards {
       }),
       terror: Map({
         name: "terrorism",
+        cn: "恐怖主义",
         late: true,
         event: false,
         side: "neutral",
@@ -645,6 +734,7 @@ class Cards {
       }),
       contra: Map({
         name: "iran-contra scandal",
+        cn: "伊朗们丑闻",
         late: true,
         event: true,
         side: "ussr",
@@ -652,6 +742,7 @@ class Cards {
       }),
       chern: Map({
         name: "chernobyl",
+        cn: "切尔诺贝利",
         late: true,
         event: true,
         side: "us",
@@ -659,6 +750,7 @@ class Cards {
       }),
       ladc: Map({
         name: "latin american debt crisis",
+        cn: "拉丁美洲债务危机",
         late: true,
         event: false,
         side: "ussr",
@@ -666,6 +758,7 @@ class Cards {
       }),
       tdtw: Map({
         name: "tear down this wall",
+        cn: "推倒柏林围墙",
         late: true,
         event: true,
         side: "us",
@@ -673,6 +766,7 @@ class Cards {
       }),
       evil: Map({
         name: "an evil empire",
+        cn: "邪恶帝国",
         late: true,
         event: true,
         side: "us",
@@ -680,6 +774,7 @@ class Cards {
       }),
       aldr: Map({
         name: "aldrich ames remix",
+        cn: "奥德里奇·艾姆斯",
         late: true,
         event: true,
         side: "ussr",
@@ -687,6 +782,7 @@ class Cards {
       }),
       persh: Map({
         name: "pershing II deployed",
+        cn: "部署潘兴二型导弹",
         late: true,
         event: true,
         side: "ussr",
@@ -694,6 +790,7 @@ class Cards {
       }),
       warg: Map({
         name: "wargames",
+        cn: "战争游戏",
         late: true,
         event: true,
         side: "neutral",
@@ -701,6 +798,7 @@ class Cards {
       }),
       solid: Map({
         name: "solidarity",
+        cn: "团结工会",
         late: true,
         event: true,
         side: "us",
@@ -708,6 +806,7 @@ class Cards {
       }),
       iiw: Map({
         name: "iran iraq war",
+        cn: "两伊战争",
         late: true,
         event: true,
         side: "neutral",
@@ -715,6 +814,7 @@ class Cards {
       }),
       camb: Map({
         name: "the cambridge five",
+        cn: "剑桥五杰",
         early: true,
         event: false,
         side: "ussr",
@@ -722,15 +822,17 @@ class Cards {
       }),
       sprel: Map({
         name: "special relationship",
+        cn: "英美特殊关系",
         early: true,
         event: false,
         side: "us",
         ops: 2
       }),
-      nord: Map({ name: "norad", early: true, event: true, side: "us", ops: 3 }),
-      che: Map({ name: "che", mid: true, event: false, side: "ussr", ops: 3 }),
+      nord: Map({ name: "norad", cn: "北美防空司令部", early: true, event: true, side: "us", ops: 3 }),
+      che: Map({ name: "che", cn: "切·格瓦拉", mid: true, event: false, side: "ussr", ops: 3 }),
       tehran: Map({
         name: "our man in tehran",
+        cn: "我们的人在德黑兰",
         mid: true,
         event: true,
         side: "us",
@@ -738,6 +840,7 @@ class Cards {
       }),
       awacs: Map({
         name: "awacs sale to saudis",
+        cn: "向沙特阿拉伯出售机载空中警报控制系统",
         late: true,
         event: true,
         side: "us",
@@ -745,6 +848,7 @@ class Cards {
       }),
       abm: Map({
         name: "ABM treaty",
+        cn: "反弹道导弹条约",
         mid: true,
         event: false,
         side: "neutral",
