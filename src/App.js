@@ -72,6 +72,11 @@ class App extends Component {
     this.appNoSaveState(st => st.set("viewBy", nv));
   };
 
+  setLanguage = event => {
+    const lang = event.target.value;
+    this.appSaveState(st => st.set("language", lang));
+  };
+
   reset = () =>
     this.appSaveState(st =>
       App.initialState(this.allCards)
@@ -145,6 +150,8 @@ class App extends Component {
 
   nextPhaseVisibility = () => this.state.data.get("phase") < 3;
 
+  language = () => this.state.data.get("language")
+
   deckContainer = (legend, cl, content) => {
     // Firefox can style fieldsets with flex display.  Looks great, but unfortunately nothing else can.
     if (this.browser.name === "firefox")
@@ -168,6 +175,7 @@ class App extends Component {
 
   static initialState = allCards =>
     Map({
+      language: "cn",
       cardStates: allCards.map(c => Map({ presence: "deck" })),
       viewBy: "byside",
       sortBy: "importance",
@@ -201,6 +209,10 @@ class App extends Component {
       "4ops+"
     ];
     this.views = ["byside", "region", "category"];
+    this.languages = [
+      {id: "en", name: "english"},
+      {id: "cn", name: "中文"}
+    ];
 
     this.allCards = Cards.cards();
 
@@ -228,6 +240,9 @@ class App extends Component {
         .sortBy(c => Cards.cardRanking().size - c.get("importance"))
         .take(15);
     }
+    const language = this.state.data.get("language")
+    const lang_id = language === "en" ? "name" : language
+
     return c
       .sort((c1, c2) => {
         switch (this.state.data.get("sortBy")) {
@@ -236,7 +251,7 @@ class App extends Component {
           case "ops":
             return defaultComparator(c2.get("ops"), c1.get("ops"));
           case "name":
-            return defaultComparator(c1.get("name").toLowerCase(), c2.get("name").toLowerCase());
+            return defaultComparator(c1.get(lang_id).toLowerCase(), c2.get(lang_id).toLowerCase());
           case "importance":
             return defaultComparator(c2.get("importance"), c1.get("importance"));
           case "playdek":
@@ -300,19 +315,21 @@ class App extends Component {
       });
   };
 
-  renderCard = (k, c) => (
-    <Card
+  renderCard = (k, c) => {
+    const language = this.state.data.get("language")
+    const lang_id = language === "en" ? "name" : language
+    return (<Card
       key={k}
       id={k}
       side={c.get("side")}
       ops={c.get("ops")}
       event={c.get("event")}
-      name={this.state.data.get("shortCardNames") ? k : c.get("name")}
+      name={this.state.data.get("shortCardNames") ? k : c.get(lang_id)}
       onNameClick={this.onNameClick}
       onDiscard={this.discardCard}
       onRemove={this.removeCard}
-    />
-  );
+    />)
+  };
 
   renderByCategory() {
     // TODO this and top of renderByRegion are complete copy paste
@@ -483,6 +500,12 @@ class App extends Component {
         break;
     }
 
+    const languages = this.languages.map(v => (
+      <option key={v.id} value={v.id}>
+        {v.name}
+      </option>
+    ));
+
     const viewOptions = this.views.map(v => (
       <option key={v} value={v}>
         {v}
@@ -509,6 +532,8 @@ class App extends Component {
       .map((c, k) => this.renderCard(k, c))
       .toList();
 
+    const language = this.language()
+
     return (
       <div className="App">
         <div className="buttons">
@@ -527,13 +552,22 @@ class App extends Component {
             <button className={this.nextPhaseVisibility() ? [] : ["hidden"]} onClick={() => this.changePhase()}>
               {this.nextPhaseLabel()}
             </button>
+
+            {language === "en" &&
             <input
               id="shortnames"
               type="checkbox"
               checked={this.state.data.get("shortCardNames")}
               onChange={this.toggleCardNames}
-            />
-            <label htmlFor="shortnames">short names</label>
+            />}
+            {language === "en"  &&
+            <label
+              htmlFor="shortnames"
+            >short names</label>
+            }
+            <select value={this.state.data.get("language")} onChange={this.setLanguage}>
+              {languages}
+            </select>
           </div>
 
           <div>
