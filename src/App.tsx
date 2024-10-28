@@ -613,7 +613,7 @@ class App extends Component {
           </div>
         </div>
         <div className={"arrow-warning" + (this.state.data.get("lastState") !== null ? "-hidden" : "")}>
-          Note: You can click on the arrow to move cards to the ussr hand!
+          Note: You can click on the arrow to move cards to your opponent's hand!
         </div>
 
         <div className="bothhands">
