@@ -5,9 +5,9 @@
   "dependencies": {
     "detect-browser": "^3.0.0",
     "immutable": "^3.8.2",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
-    "react-scripts": "1.1.4"
+    "react": "^18.0",
+    "react-dom": "^18.0",
+    "react-scripts": "^5.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -21,5 +21,17 @@
   "prettier": {
     "printWidth": 120
   },
-  "homepage": "."
+  "homepage": ".",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }
