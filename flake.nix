@@ -152,8 +152,8 @@
     # nix run .#build
     apps.x86_64-linux.build = build;
 
-    # nix  -L build .#container && podman load < result && podman run --rmi -it -p 127.0.0.1:8080:8080 localhost/ts-container
-    # nix  -L build .#container && docker load < result && docker run --rm -it -p 127.0.0.1:8080:8080 localhost/ts-container
+    # nix -L build .#container && podman load < result && podman run --rmi -it -p 127.0.0.1:8080:8080 localhost/ts-container
+    # nix -L build .#container && docker load < result && docker run --rm -it -p 127.0.0.1:8080:8080 localhost/ts-container
     packages.x86_64-linux.container = container;
 
     # nix develop
