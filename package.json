@@ -5,7 +5,6 @@
   "private": true,
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.3",
-    "detect-browser": "^3.0.0",
     "immutable": "^3.8.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -14,11 +13,15 @@
   },
   "scripts": {
     "start": "vite",
+    "tsc": "tsc -w",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
-    "prettier": "^1.13.5"
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "prettier": "^1.13.5",
+    "typescript": "^5.6.3"
   },
   "prettier": {
     "printWidth": 120

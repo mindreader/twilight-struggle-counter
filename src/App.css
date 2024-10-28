@@ -34,6 +34,13 @@ i.fa-arrow-right {
   padding: 5px;
 }
 
+.arrow-warning-hidden {
+  display: none;
+}
+.arrow-warning {
+  display: flex;
+  justify-content: center;
+}
 .bothhands {
   display: flex;
   justify-content: center;

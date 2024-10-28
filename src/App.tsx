@@ -1,9 +1,8 @@
 import { Component } from "react";
 import "./App.css";
-import Cards from "./Cards.js";
-import SessionStorage from "./SessionStorage.js";
-import { detect } from "detect-browser";
-import { Download, Load } from "./Save.js"
+import Cards from "./Cards";
+import SessionStorage from "./SessionStorage";
+import { Load, Download } from "./Save"
 
 import { Map, fromJS } from "immutable";
 
@@ -12,39 +11,57 @@ import { Map, fromJS } from "immutable";
 // view byregion
 // card count
 
-class Card extends Component {
-  render = () => {
+interface CardProps {
+  id: string;
+  side: string;
+  ops: number;
+  event: boolean;
+  name: string;
+  onNameClick: (id: string) => void;
+  onDiscard: (id: string) => void;
+  onRemove: (id: string) => void;
+}
+
+function Card({
+  id,
+  side,
+  ops,
+  event,
+  name,
+  onNameClick,
+  onDiscard,
+  onRemove,
+}: CardProps) {
     return (
       <li
-        className={"card " + this.props.side}
+        className={"card " + side}
         onClick={e => {
           e.stopPropagation();
-          this.props.onNameClick(this.props.id);
+          onNameClick(id);
         }}
       >
         <i
-          className={"remove fas fa-ban" + (this.props.event ? "" : " hidden")}
+          className={"remove fas fa-ban" + (event ? "" : " hidden")}
           onClick={e => {
             e.stopPropagation();
-            this.props.onRemove(this.props.id);
+            onRemove(id);
           }}
         />
         <i
           className="discard fas fa-arrow-circle-down"
           onClick={e => {
             e.stopPropagation();
-            this.props.onDiscard(this.props.id);
+            onDiscard(id);
           }}
         />
-        {this.props.ops == null ? <i className="score fas fa-star-half-alt" /> : "\u00A0" + this.props.ops}{" "}
-        {this.props.name}
+        {ops == null ? <i className="score fas fa-star-half-alt" /> : "\u00A0" + ops}{" "}
+        {name}
       </li>
     );
-  };
 }
 
 // wish immutable would just export this.
-const defaultComparator = (a, b) => (a > b ? 1 : a < b ? -1 : 0);
+const defaultComparator = (a: any, b: any) => (a > b ? 1 : a < b ? -1 : 0);
 
 class App extends Component {
   appSaveState = f => this.setState(({ data }) => ({ data: SessionStorage.set(f(data)) }));
@@ -153,15 +170,15 @@ class App extends Component {
   language = () => this.state.data.get("language")
 
   deckContainer = (legend, cl, content) => {
-    // Firefox can style fieldsets with flex display.  Looks great, but unfortunately nothing else can.
-    if (this.browser.name === "firefox")
-      return (
-        <fieldset className={cl}>
-          <legend align="center">{legend}</legend>
-          {content}
-        </fieldset>
-      );
-    else return <div className={cl}>{content}</div>;
+    // It used to be only firefox could style fieldsets, but now chrome can, too.
+    // I can't test on safari but I want to get rid of this check so here's to
+    // hoping it works on there too...
+    return (
+      <fieldset className={cl}>
+      <legend align="center">{legend}</legend>
+      {content}
+      </fieldset>
+    );
   };
 
   nextPhaseLabel = () => {
@@ -190,7 +207,6 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.browser = detect();
     this.storage = SessionStorage.storageAvailable("sessionStorage");
 
     this.sorts = ["name", "importance", "ops", "playdek"];
@@ -594,6 +610,10 @@ class App extends Component {
             </button>
           </div>
         </div>
+        <div className={"arrow-warning" + (this.state.data.get("lastState") !== null ? "-hidden" : "")}>
+          Note: You can click on the arrow to move cards to the ussr hand!
+        </div>
+
         <div className="bothhands">
           <div className="hand lefthand">
             <fieldset>
