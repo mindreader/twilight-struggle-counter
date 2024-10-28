@@ -392,7 +392,7 @@ class App extends Component {
     const content = [suicide, defconimpr, defcondegr, badcarddisc, warcards, china, cardstealers].map(
       ({ cat, data }) => (
         <fieldset key={cat} className="cardCol">
-          <legend align="center">{cat}</legend>
+          <legend align="center">{cat} ({data.count()})</legend>
           <ul>{data}</ul>
         </fieldset>
       )
@@ -440,7 +440,7 @@ class App extends Component {
     let ca = { region: "central america", data: f("ca") };
     const content = [eu, mid, asia, sea, afr, sa, ca].map(({ region, data }) => (
       <fieldset key={region} className="cardCol">
-        <legend align="center">{region}</legend>
+        <legend align="center">{region} ({data.count()})</legend>
         <ul>{data}</ul>
       </fieldset>
     ));
@@ -467,7 +467,7 @@ class App extends Component {
     const content = [us, neutral, ussr].map(({ side, data }) => (
       <div key={side} className="cardCol">
         <fieldset>
-          <legend align="center">{side}</legend>
+          <legend align="center">{side} ({data.count()})</legend>
           <ul>{data}</ul>
         </fieldset>
       </div>
