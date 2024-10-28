@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 class SessionStorage {
   static storageAvailable = type => {
     try {

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Map, Seq, Set } from "immutable";
 
 class Cards {

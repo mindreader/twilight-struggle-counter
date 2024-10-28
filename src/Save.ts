@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 class Download {
 
   static download = (data) => {
