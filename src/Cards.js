@@ -1,4 +1,4 @@
-const { Map, Seq, Set } = require("immutable");
+import { Map, Seq, Set } from "immutable";
 
 class Cards {
   static rawCards = () =>

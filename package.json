@@ -1,19 +1,21 @@
 {
   "name": "tscounter",
+  "type": "module",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@vitejs/plugin-react": "^4.3.3",
     "detect-browser": "^3.0.0",
     "immutable": "^3.8.2",
-    "react": "^18.0",
-    "react-dom": "^18.0",
-    "react-scripts": "^5.0.1"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^5.4.10",
+    "vite-tsconfig-paths": "^5.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "start": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "devDependencies": {
     "prettier": "^1.13.5"

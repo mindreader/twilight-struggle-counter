@@ -1,11 +1,11 @@
-import React, { Component } from "react";
+import { Component } from "react";
 import "./App.css";
 import Cards from "./Cards.js";
 import SessionStorage from "./SessionStorage.js";
 import { detect } from "detect-browser";
 import { Download, Load } from "./Save.js"
 
-const { Map, fromJS } = require("immutable");
+import { Map, fromJS } from "immutable";
 
 // TODO limit undo history to a certain number of steps (30?)
 // game log?
