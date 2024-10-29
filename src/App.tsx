@@ -43,7 +43,7 @@ function Card({
         }}
       >
         <i
-          className={"remove fas fa-ban" + (event ? "" : " hidden")}
+          className={"remove fas" + (id == "shutt" ? " fa-flag" : " fa-ban") + (event || id === "shutt" ? "" : " hidden")}
           onClick={e => {
             e.stopPropagation();
             onRemove(id);
@@ -56,7 +56,12 @@ function Card({
             onDiscard(id);
           }}
         />
-        {ops == null ? <i className="score fas fa-star-half-alt" /> : "\u00A0" + ops}{" "}
+        {
+          ops == null ?
+            <i className="score fas fa-star-half-alt" />
+          : "\u00A0" + ops
+        }
+        {" "}
         {name}
       </li>
     );
@@ -145,7 +150,17 @@ class App extends Component {
     return this.moveCard(card, pres === "deck" ? hand : "deck");
   };
   discardCard = card => this.moveCard(card, "discarded");
-  removeCard = card => this.moveCard(card, "removed");
+  removeCard = card => {
+
+    // shuttle diplomacy does not get removed, it gets put in front of the us until a mideast scoring
+    // card is played, then it is discarded.
+    if (card == "shutt") {
+      this.moveCard(card, "infrontofus");
+    }
+    else {
+      this.moveCard(card, "removed");
+    }
+  }
 
   moveCard = (card, to) => this.appSaveState(st => st.setIn(["cardStates", card, "presence"], to).set("lastState", st));
 
@@ -455,7 +470,7 @@ class App extends Component {
         .filter(c => c.get("side") === side)
         .filter((c, k) => {
           const pres = this.state.data.getIn(["cardStates", k, "presence"]);
-          return pres !== "inhand" && pres !== "ophand" && pres !== "discarded" && pres !== "removed";
+          return pres !== "inhand" && pres !== "ophand" && pres !== "discarded" && pres !== "removed" && pres !== "infrontofus";
         })
         .map((c, k) => this.renderCard(k, c))
         .toList();
@@ -487,8 +502,13 @@ class App extends Component {
 
     const discards = keep("discarded");
     const removes = keep("removed");
+    const infrontofus = keep("infrontofus");
 
-    const content = [{ name: "removed", data: removes }, { name: "discarded", data: discards }].map(c => (
+    const content = [
+      { name: "removed", data: removes },
+      { name: "discarded", data: discards },
+      infrontofus.count() ? { name: "infrontofus", data: infrontofus } : null
+    ].filter(c => c).map(c => (
       <div key={c.name} id={c.name} className="cardCol">
         <fieldset>
           <legend align="center">{c.name} ({c.data.count()})</legend>

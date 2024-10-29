@@ -33,6 +33,8 @@ The app tries to be smart about regions and category lists, but there are limits
 
 Sometimes it is convenient to filter by some criteria.  "All" will show all cards, and you will need to be in that mode to select from the full set of cards.  "Most important 15" selects the 15 most important cards (based on my opinion) which are not in the discard or removed.
 
+Shuttle Diplomacy is weird - when evented, it ends up in front of the US and then when a mideast scoring occurs it gets discarded. Therefore it has a flag icon to indicate when it "goes in front of the us" as well as the normal discard, so that you can move it in between those states. We do not try to automatically detect when mideast scoring occurs because it is error prone and it is better to just leave the buttons for you to do it yourself. Obviously the "in front of us" block only appears when shuttle diplomacy is in it.
+
 # Issues
 If you find any bugs or have any suggestions, file an issue here on github and I'll take a look.
 

@@ -578,7 +578,7 @@ class Cards {
         name: "shuttle diplomacy",
         cn: "穿梭外交",
         mid: true,
-        event: true,
+        event: false,
         side: "us",
         ops: 3
       }),

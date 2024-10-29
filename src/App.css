@@ -117,7 +117,7 @@ li.card.neutral:hover {
 }
 
 
-#removed i.remove, #discarded i.discard {
+#removed i.remove, #discarded i.discard, #infrontofus i.remove, #i.remove {
   display: none;
 }
 
