@@ -1,5 +1,5 @@
 class Download {
-  static download = (data) => {
+  static download = (data: any) => {
     var blob = new Blob([JSON.stringify(data)], {type: 'text/plain'});
     const filename = prompt("filename")
     if (filename) {
