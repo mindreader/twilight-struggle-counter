@@ -36,10 +36,10 @@
 
       src = with pkgs.lib.fileset; toSource {
         root = ./.;
-        fileset = unions [ ./src ./tsconfig.json ./package.json ./package-lock.json ./public ./index.html ];
+        fileset = unions [ ./src ./vite.config.ts ./vite-env.d.ts ./tsconfig.json ./package.json ./package-lock.json ./public ./index.html ];
       };
 
-      npmDepsHash = "sha256-xVOdvxL1X22fyy7HETUcKvxJrP0wueQP8+VWe64ng9c=";
+      npmDepsHash = "sha256-R/RkAERKxlzx7e0UqmMijf3iMdxZr3WEQiyVOGUGsHk";
 
       buildPhase = ''
        npm run build
@@ -127,7 +127,7 @@
 #
 #        (pkgs.buildEnv {
 #          name = "image-root";
-#          paths = [ pkgs.bash pkgs.coreutils pkgs.gnugrep pkgs.findutils pkgs.less ];
+#          paths = [ pkgs.bash pkgs.coreutils pkgs.gnugrep pkgs.findutils pkgs.less pkgs.procps ];
 #          pathsToLink = "/bin";
 #        })
 #     ];
@@ -153,7 +153,8 @@
     apps.x86_64-linux.build = build;
 
     # nix -L build .#container && podman load < result && podman run --rm -it -p 127.0.0.1:8080:8080 localhost/ts-container
-    # nix -L build .#container && docker load < result && docker run --rm -it -p 127.0.0.1:8080:8080 localhost/ts-container
+    # nix -L build .#container && docker load < result && podman run --rm -it -p 127.0.0.1:8080:8080 localhost/ts-container
+    #                                                  (or podman push localhost/ts-container workpad.taile1828d.ts.net/ts-container)
     packages.x86_64-linux.container = container;
 
     # nix develop
