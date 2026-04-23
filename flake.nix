@@ -39,7 +39,7 @@
         fileset = unions [ ./src ./vite.config.ts ./vite-env.d.ts ./tsconfig.json ./package.json ./package-lock.json ./public ./index.html ];
       };
 
-      npmDepsHash = "sha256-R/RkAERKxlzx7e0UqmMijf3iMdxZr3WEQiyVOGUGsHk";
+      npmDepsHash = "sha256-NdNmLIypo2mYjDKBetTx7B1qrd4w9xFhMbTWvsw/XtA=";
 
       buildPhase = ''
        npm run build
