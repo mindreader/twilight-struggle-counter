@@ -14,7 +14,7 @@ class Download {
 }
 
 class Load {
-  static load = (files: File[], onsuccess: (data: any) => void) => {
+  static load = (files: FileList, onsuccess: (data: any) => void) => {
       for (var i = 0; i < files.length; ++i) {
 
         const f = (file: File) => {               // Wrap current file in a closure.

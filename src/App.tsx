@@ -1,17 +1,26 @@
-// @ts-nocheck
-
-import { Component } from "react";
+import React, { Component, ChangeEvent, ReactNode } from "react";
 import "./App.css";
-import Cards from "./Cards";
+import Cards, { CardMap, ImmutableCard, CardValue } from "./Cards";
 import SessionStorage from "./SessionStorage";
-import { Load, Download } from "./Save"
+import { Load, Download } from "./Save";
 
-import { Map, fromJS } from "immutable";
+import { Map, List, fromJS } from "immutable";
 
 // TODO limit undo history to a certain number of steps (30?)
 // game log?
 // view byregion
 // card count
+
+type Presence = "deck" | "inhand" | "ophand" | "discarded" | "removed" | "infrontofus";
+
+// The app state is an immutable Map. We use `any` for the value type because
+// fromJS() produces deeply nested structures and the values are heterogeneous
+// (strings, numbers, booleans, nulls, nested Maps). The alternative would be
+// rewriting all state access to use plain objects or immutable Records.
+type AppData = Map<string, any>;
+
+// Per-card state as stored in the save file / app state
+type CardStateMap = Map<string, Map<string, Presence>>;
 
 interface CardProps {
   id: string;
@@ -67,36 +76,46 @@ function Card({
     );
 }
 
-// wish immutable would just export this.
-const defaultComparator = (a: any, b: any) => (a > b ? 1 : a < b ? -1 : 0);
+const defaultComparator = (a: CardValue, b: CardValue) => (a! > b! ? 1 : a! < b! ? -1 : 0);
 
-class App extends Component {
-  appSaveState = f => this.setState(({ data }) => ({ data: SessionStorage.set(f(data)) }));
-  appNoSaveState = f => this.setState(({ data }) => ({ data: f(data) }));
+interface AppState {
+  data: AppData;
+}
 
-  changePhase = () => this.appSaveState(st => st.update("phase", p => (p < 3 ? p + 1 : 1)).set("lastState", st));
+class App extends Component<Record<string, never>, AppState> {
+  storage: boolean;
+  sorts: string[];
+  filters: string[];
+  views: string[];
+  languages: { id: string; name: string }[];
+  allCards: CardMap;
 
-  toggleCardNames = () => this.appNoSaveState(st => st.update("shortCardNames", old => !old));
+  appSaveState = (f: (data: AppData) => AppData) => this.setState(({ data }) => ({ data: SessionStorage.set(f(data)) }));
+  appNoSaveState = (f: (data: AppData) => AppData) => this.setState(({ data }) => ({ data: f(data) }));
+
+  changePhase = () => this.appSaveState(st => st.update("phase", (p: number) => (p < 3 ? p + 1 : 1)).set("lastState", st));
+
+  toggleCardNames = () => this.appNoSaveState(st => st.update("shortCardNames", (old: boolean) => !old));
 
   toggleUSSR = () =>
-    this.appNoSaveState(st => st.update("ussrSelected", oldside => (oldside !== "ussr" ? "ussr" : null)));
+    this.appNoSaveState(st => st.update("ussrSelected", (oldside: string | null) => (oldside !== "ussr" ? "ussr" : null)));
 
-  setSort = event => {
+  setSort = (event: ChangeEvent<HTMLSelectElement>) => {
     const ns = event.target.value;
     this.appNoSaveState(st => st.set("sortBy", ns));
   };
 
-  setFilter = event => {
+  setFilter = (event: ChangeEvent<HTMLSelectElement>) => {
     const nf = event.target.value;
     this.appNoSaveState(st => st.set("filterBy", nf));
   };
 
-  setView = event => {
+  setView = (event: ChangeEvent<HTMLSelectElement>) => {
     const nv = event.target.value;
     this.appNoSaveState(st => st.set("viewBy", nv));
   };
 
-  setLanguage = event => {
+  setLanguage = (event: ChangeEvent<HTMLSelectElement>) => {
     const lang = event.target.value;
     this.appSaveState(st => st.set("language", lang));
   };
@@ -127,14 +146,14 @@ class App extends Component {
   addDiscards = () => {
     this.appSaveState(st =>
       st
-        .update("cardStates", cs =>
+        .update("cardStates", (cs: CardStateMap) =>
           cs.map((c, k) =>
             c.update(
               "presence",
-              presence =>
+              (presence) =>
                 presence === "discarded"
                   ? "deck"
-                  : presence === "deck" && this.phaseFilter(this.allCards.get(k))
+                  : presence === "deck" && this.phaseFilter(this.allCards.get(k)!)
                     ? "ophand"
                     : presence
             )
@@ -144,13 +163,13 @@ class App extends Component {
     );
   };
 
-  onNameClick = card => {
+  onNameClick = (card: string) => {
     const hand = this.state.data.get("ussrSelected") === "ussr" ? "ophand" : "inhand";
     const pres = this.state.data.getIn(["cardStates", card, "presence"]);
     return this.moveCard(card, pres === "deck" ? hand : "deck");
   };
-  discardCard = card => this.moveCard(card, "discarded");
-  removeCard = card => {
+  discardCard = (card: string) => this.moveCard(card, "discarded");
+  removeCard = (card: string) => {
 
     // shuttle diplomacy does not get removed, it gets put in front of the us until a mideast scoring
     // card is played, then it is discarded.
@@ -162,11 +181,11 @@ class App extends Component {
     }
   }
 
-  moveCard = (card, to) => this.appSaveState(st => st.setIn(["cardStates", card, "presence"], to).set("lastState", st));
+  moveCard = (card: string, to: Presence) => this.appSaveState(st => st.setIn(["cardStates", card, "presence"], to).set("lastState", st));
 
-  cardClicked = card =>
+  cardClicked = (card: string) =>
     this.appSaveState(st => {
-      st.updateIn(["cardStates", card, "presence"], presence => {
+      return st.updateIn(["cardStates", card, "presence"], (presence: unknown) => {
         switch (presence) {
           case "deck":
             return "inhand";
@@ -184,15 +203,12 @@ class App extends Component {
 
   nextPhaseVisibility = () => this.state.data.get("phase") < 3;
 
-  language = () => this.state.data.get("language")
+  language = (): string => this.state.data.get("language")
 
-  deckContainer = (legend, cl, content) => {
-    // It used to be only firefox could style fieldsets, but now chrome can, too.
-    // I can't test on safari but I want to get rid of this check so here's to
-    // hoping it works on there too...
+  deckContainer = (legend: string, cl: string, content: ReactNode) => {
     return (
       <fieldset className={cl}>
-      <legend align="center">{legend}</legend>
+      <legend>{legend}</legend>
       {content}
       </fieldset>
     );
@@ -207,10 +223,10 @@ class App extends Component {
     }
   };
 
-  static initialState = allCards =>
+  static initialState = (allCards: CardMap): AppData =>
     Map({
       language: "en",
-      cardStates: allCards.map(c => Map({ presence: "deck" })),
+      cardStates: allCards.map(() => Map({ presence: "deck" })),
       viewBy: "byside",
       sortBy: "importance",
       filterBy: "all",
@@ -221,7 +237,7 @@ class App extends Component {
       lastState: null
     });
 
-  constructor(props) {
+  constructor(props: Record<string, never>) {
     super(props);
 
     this.storage = SessionStorage.storageAvailable("sessionStorage");
@@ -252,39 +268,39 @@ class App extends Component {
     this.cardClicked = this.cardClicked.bind(this);
 
     this.state = {
-      data: this.storage && SessionStorage.has() ? fromJS(SessionStorage.get()) : App.initialState(this.allCards)
+      data: this.storage && SessionStorage.has() ? fromJS(SessionStorage.get()) as AppData : App.initialState(this.allCards)
     };
   }
 
-  phaseFilter = card => {
-    const phase = this.state.data.get("phase");
+  phaseFilter = (card: ImmutableCard) => {
+    const phase = this.state.data.get("phase") as number;
     return phase >= 3 || (phase >= 2 && !card.get("late")) || (phase === 1 && card.get("early"));
   };
 
   cards = () => {
-    let c = this.allCards.filter(c => this.phaseFilter(c));
+    let c = this.allCards.filter((c: ImmutableCard) => this.phaseFilter(c));
     // TODO filter by most important that are not "gone"
     if (this.state.data.get("filterBy") === "most important 15") {
       c = c
-        .filter((c, k) => {
+        .filter((_c: ImmutableCard, k: string) => {
           const pres = this.state.data.getIn(["cardStates", k, "presence"]);
           return pres !== "removed" && pres !== "discarded" && pres !== "inhand" && pres !== "gone";
         })
-        .sortBy(c => Cards.cardRanking().size - c.get("importance"))
-        .take(15);
+        .sortBy((c: ImmutableCard) => Cards.cardRanking().count() - (c.get("importance") as number))
+        .take(15) as CardMap;
     }
-    const language = this.state.data.get("language")
-    const lang_id = language === "en" ? "name" : language
+    const language = this.state.data.get("language") as string;
+    const lang_id = language === "en" ? "name" : language;
 
     return c
-      .sort((c1, c2) => {
+      .sort((c1: ImmutableCard, c2: ImmutableCard) => {
         switch (this.state.data.get("sortBy")) {
           case "all":
             return 0;
           case "ops":
             return defaultComparator(c2.get("ops"), c1.get("ops"));
           case "name":
-            return defaultComparator(c1.get(lang_id).toLowerCase(), c2.get(lang_id).toLowerCase());
+            return defaultComparator((c1.get(lang_id) as string).toLowerCase(), (c2.get(lang_id) as string).toLowerCase());
           case "importance":
             return defaultComparator(c2.get("importance"), c1.get("importance"));
           case "playdek":
@@ -311,23 +327,23 @@ class App extends Component {
 
             // playdek doesn't actually sort by name, but I don't see any
             // consistent way to break ties.
-            return defaultComparator(c1.get("name").toLowerCase(), c2.get("name").toLowerCase());
+            return defaultComparator((c1.get("name") as string).toLowerCase(), (c2.get("name") as string).toLowerCase());
           default:
-            return c.get("name");
+            return 0;
         }
       })
-      .filter(c => {
+      .filter((c: ImmutableCard) => {
         switch (this.state.data.get("filterBy")) {
           case "scoring":
             return c.get("scoringcard");
           case "nonscoring":
             return !c.get("scoringcard");
           case "2ops+":
-            return c.get("ops") >= 2;
+            return (c.get("ops") as number) >= 2;
           case "3ops+":
-            return c.get("ops") >= 3;
+            return (c.get("ops") as number) >= 3;
           case "4ops+":
-            return c.get("ops") >= 4;
+            return (c.get("ops") as number) >= 4;
           case "us":
             return c.get("side") === "us";
           case "ussr":
@@ -342,22 +358,22 @@ class App extends Component {
             return true;
         }
       })
-      .sortBy((c, k) => {
-        let pres = this.state.data.getIn(["cardStates", k, "presence"]);
+      .sortBy((_c: ImmutableCard, k: string) => {
+        const pres = this.state.data.getIn(["cardStates", k, "presence"]);
         return pres === "discarded" ? 1 : 0;
       });
   };
 
-  renderCard = (k, c) => {
-    const language = this.state.data.get("language")
-    const lang_id = language === "en" ? "name" : language
+  renderCard = (k: string, c: ImmutableCard) => {
+    const language = this.state.data.get("language") as string;
+    const lang_id = language === "en" ? "name" : language;
     return (<Card
       key={k}
       id={k}
-      side={c.get("side")}
-      ops={c.get("ops")}
-      event={c.get("event")}
-      name={this.state.data.get("shortCardNames") ? k : c.get(lang_id)}
+      side={c.get("side") as string}
+      ops={c.get("ops") as number}
+      event={c.get("event") as boolean}
+      name={this.state.data.get("shortCardNames") ? k : c.get(lang_id) as string}
       onNameClick={this.onNameClick}
       onDiscard={this.discardCard}
       onRemove={this.removeCard}
@@ -368,32 +384,29 @@ class App extends Component {
     // TODO this and top of renderByRegion are complete copy paste
     const cards = this.cards();
     const regInfo = Cards.cardRegions(
-      this.state.data
-        .get("cardStates")
+      (this.state.data.get("cardStates") as CardStateMap)
         .filter(c => c.get("presence") === "removed")
         .keySeq()
         .toSet(),
-      this.state.data
-        .get("cardStates")
-        .filter(
-          (c, k) =>
+      (this.state.data.get("cardStates") as CardStateMap)
+        .filter((c, k) =>
             c.get("presence") === "discarded" &&
             this.allCards.getIn([k, "side"]) !== "ussr" &&
             !this.allCards.getIn([k, "scoringcard"])
         )
         .keySeq()
         .toSet(),
-      this.state.data.get("phase")
+      this.state.data.get("phase") as number
     );
 
-    const f = category =>
+    const f = (category: string) =>
       cards
-        .filter((c, k) => regInfo.get(category).has(k))
-        .filter((c, k) => {
+        .filter((_c: ImmutableCard, k: string) => regInfo.get(category)!.has(k))
+        .filter((_c: ImmutableCard, k: string) => {
           const pres = this.state.data.getIn(["cardStates", k, "presence"]);
           return pres === "deck";
         })
-        .map((c, k) => this.renderCard(k, c))
+        .map((c: ImmutableCard, k: string) => this.renderCard(k, c))
         .toList();
 
     const suicide = { cat: "suicide", data: f("suicide") };
@@ -407,7 +420,7 @@ class App extends Component {
     const content = [suicide, defconimpr, defcondegr, badcarddisc, warcards, china, cardstealers].map(
       ({ cat, data }) => (
         <fieldset key={cat} className="cardCol">
-          <legend align="center">{cat} ({data.count()})</legend>
+          <legend>{cat} ({data.count()})</legend>
           <ul>{data}</ul>
         </fieldset>
       )
@@ -418,32 +431,29 @@ class App extends Component {
   renderByRegion() {
     const cards = this.cards();
     const regInfo = Cards.cardRegions(
-      this.state.data
-        .get("cardStates")
+      (this.state.data.get("cardStates") as CardStateMap)
         .filter(c => c.get("presence") === "removed")
         .keySeq()
         .toSet(),
-      this.state.data
-        .get("cardStates")
-        .filter(
-          (c, k) =>
+      (this.state.data.get("cardStates") as CardStateMap)
+        .filter((c, k) =>
             c.get("presence") === "discarded" &&
             this.allCards.getIn([k, "side"]) !== "ussr" &&
             !this.allCards.getIn([k, "scoringcard"])
         )
         .keySeq()
         .toSet(),
-      this.state.data.get("phase")
+      this.state.data.get("phase") as number
     );
 
-    const f = region =>
+    const f = (region: string) =>
       cards
-        .filter((c, k) => regInfo.get(region).has(k) || regInfo.get("all").has(k))
-        .filter((c, k) => {
+        .filter((_c: ImmutableCard, k: string) => regInfo.get(region)!.has(k) || regInfo.get("all")!.has(k))
+        .filter((_c: ImmutableCard, k: string) => {
           const pres = this.state.data.getIn(["cardStates", k, "presence"]);
           return pres === "deck";
         })
-        .map((c, k) => this.renderCard(k, c))
+        .map((c: ImmutableCard, k: string) => this.renderCard(k, c))
         .toList();
 
     let eu = { region: "europe", data: f("eu") };
@@ -455,7 +465,7 @@ class App extends Component {
     let ca = { region: "central america", data: f("ca") };
     const content = [eu, mid, asia, sea, afr, sa, ca].map(({ region, data }) => (
       <fieldset key={region} className="cardCol">
-        <legend align="center">{region} ({data.count()})</legend>
+        <legend>{region} ({data.count()})</legend>
         <ul>{data}</ul>
       </fieldset>
     ));
@@ -465,14 +475,14 @@ class App extends Component {
 
   renderBySide() {
     const cards = this.cards();
-    const f = side =>
+    const f = (side: string) =>
       cards
-        .filter(c => c.get("side") === side)
-        .filter((c, k) => {
+        .filter((c: ImmutableCard) => c.get("side") === side)
+        .filter((_c: ImmutableCard, k: string) => {
           const pres = this.state.data.getIn(["cardStates", k, "presence"]);
           return pres !== "inhand" && pres !== "ophand" && pres !== "discarded" && pres !== "removed" && pres !== "infrontofus";
         })
-        .map((c, k) => this.renderCard(k, c))
+        .map((c: ImmutableCard, k: string) => this.renderCard(k, c))
         .toList();
 
     const us = { side: "us", data: f("us") };
@@ -482,7 +492,7 @@ class App extends Component {
     const content = [us, neutral, ussr].map(({ side, data }) => (
       <div key={side} className="cardCol">
         <fieldset>
-          <legend align="center">{side} ({data.count()})</legend>
+          <legend>{side} ({data.count()})</legend>
           <ul>{data}</ul>
         </fieldset>
       </div>
@@ -492,12 +502,12 @@ class App extends Component {
   }
 
   renderDiscardRemoved = () => {
-    const keep = pres =>
+    const keep = (pres: Presence) =>
       this.cards()
-        .filter((c, k) => {
+        .filter((_c: ImmutableCard, k: string) => {
           return this.state.data.getIn(["cardStates", k, "presence"]) === pres;
         })
-        .map((c, k) => this.renderCard(k, c))
+        .map((c: ImmutableCard, k: string) => this.renderCard(k, c))
         .toList();
 
     const discards = keep("discarded");
@@ -508,10 +518,10 @@ class App extends Component {
       { name: "removed", data: removes },
       { name: "discarded", data: discards },
       infrontofus.count() ? { name: "infrontofus", data: infrontofus } : null
-    ].filter(c => c).map(c => (
+    ].filter((c): c is { name: string; data: List<React.JSX.Element> } => c !== null).map(c => (
       <div key={c.name} id={c.name} className="cardCol">
         <fieldset>
-          <legend align="center">{c.name} ({c.data.count()})</legend>
+          <legend>{c.name} ({c.data.count()})</legend>
           <ul>{c.data}</ul>
         </fieldset>
       </div>
@@ -561,13 +571,13 @@ class App extends Component {
     ));
 
     const yourhand = this.cards()
-      .filter((c, k) => this.state.data.getIn(["cardStates", k, "presence"]) === "inhand")
-      .map((c, k) => this.renderCard(k, c))
+      .filter((_c: ImmutableCard, k: string) => this.state.data.getIn(["cardStates", k, "presence"]) === "inhand")
+      .map((c: ImmutableCard, k: string) => this.renderCard(k, c))
       .toList();
 
     const ophand = this.cards()
-      .filter((c, k) => this.state.data.getIn(["cardStates", k, "presence"]) === "ophand")
-      .map((c, k) => this.renderCard(k, c))
+      .filter((_c: ImmutableCard, k: string) => this.state.data.getIn(["cardStates", k, "presence"]) === "ophand")
+      .map((c: ImmutableCard, k: string) => this.renderCard(k, c))
       .toList();
 
     const language = this.language()
@@ -578,8 +588,10 @@ class App extends Component {
           <div>
             <label id="savebutton" htmlFor="myfile" >Load Game</label>
 
-            <input onChange={(event) => Load.load(event.target.files, js => this.appSaveState(() => fromJS(js)))
-            } className="hidden" id="myfile" name="files[]" type="file"/>
+            <input onChange={(event) => {
+              const files = event.target.files;
+              if (files) Load.load(files, (js: unknown) => this.appSaveState(() => fromJS(js) as AppData));
+            }} className="hidden" id="myfile" name="files[]" type="file"/>
 
             <label id="loadbutton" htmlFor="save" onClick={() => Download.download(this.state.data.update("lastState", () => null))}>Save Game</label>
 
@@ -587,7 +599,7 @@ class App extends Component {
             <button title="Note: cards in deck will be moved to opponent's hand" onClick={() => this.addDiscards()}>
               readd discards
             </button>
-            <button className={this.nextPhaseVisibility() ? [] : ["hidden"]} onClick={() => this.changePhase()}>
+            <button className={this.nextPhaseVisibility() ? "" : "hidden"} onClick={() => this.changePhase()}>
               {this.nextPhaseLabel()}
             </button>
 
@@ -660,9 +672,6 @@ class App extends Component {
         </div>
         <span>{content}</span>
         <div className="collapseedges">{this.renderDiscardRemoved()}</div>
-        {/*<div>
-      {JSON.stringify(this.state.data.get('cardStates'))}
-        </div>*/}
       </div>
     );
   };

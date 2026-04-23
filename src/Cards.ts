@@ -1,9 +1,25 @@
-// @ts-nocheck
-
 import { Map, Seq, Set } from "immutable";
 
+export interface CardData {
+  name: string;
+  cn: string;
+  early?: boolean;
+  mid?: boolean;
+  late?: boolean;
+  event: boolean;
+  side: "us" | "ussr" | "neutral";
+  ops?: number;
+  scoringcard?: boolean;
+  importance?: number;
+}
+
+export type CardId = string;
+export type CardValue = CardData[keyof CardData]; // string | number | boolean | undefined
+export type ImmutableCard = Map<string, CardValue>;
+export type CardMap = Map<CardId, ImmutableCard>;
+
 class Cards {
-  static rawCards = () =>
+  static rawCards = (): CardMap =>
     Map({
       japan: Map({
         name: "us / japan pact",
@@ -856,8 +872,9 @@ class Cards {
         side: "neutral",
         ops: 4
       })
-    });
-  static cardRanking = () =>
+    }) as CardMap;
+
+  static cardRanking = (): Seq.Indexed<string> =>
     Seq([
       "summ",
       "ireds",
@@ -971,8 +988,8 @@ class Cards {
     ]);
 
   // List of cards to watch out for in regions which which they effect.
-  static cardRegions = (cardsRemoved, validStarWarsTargets, phase) => {
-    let cards = Map({
+  static cardRegions = (cardsRemoved: Set<string>, validStarWarsTargets: Set<string>, phase: number): Map<string, Set<string>> => {
+    let cards = Map<string, Set<string>>({
       // we aren't including ones no one will play like olympic games or summit.
       suicide: Set(["cia", "lone", "d&c", "wwby", "ortega", "kal", "gsales"]),
       // cards that are commonly used to improve the defcon to get rid of a bad card
@@ -1019,22 +1036,22 @@ class Cards {
     });
 
     if (cardsRemoved.has("jp2")) {
-      cards = cards.updateIn(["eu"], s => s.add("solid"));
+      cards = cards.update("eu", s => s!.add("solid"));
     }
     if (cardsRemoved.has("awacs")) {
-      cards = cards.updateIn(["me"], s => s.remove("musrev"));
+      cards = cards.update("me", s => s!.remove("musrev"));
     }
     if (cardsRemoved.has("camp")) {
-      cards = cards.updateIn(["me"], s => s.remove("aiwar"));
+      cards = cards.update("me", s => s!.remove("aiwar"));
     }
 
     // cambridge five in late war
-    if (phase === 3) cards = cards.updateIn(["all"], s => s.remove("cam"));
+    if (phase === 3) cards = cards.update("all", s => s!.remove("cam"));
 
     // star wars, add to all categories
     if (phase === 3) {
-      cards = cards.map((s, cat) => {
-        const add = validStarWarsTargets.reduce((accum, card) => (s.has(card) ? true : accum), false);
+      cards = cards.map(s => {
+        const add = validStarWarsTargets.reduce((accum: boolean, card: string) => (s.has(card) ? true : accum), false);
         return add ? s.add("sw") : s;
       });
     }
@@ -1042,10 +1059,12 @@ class Cards {
     return cards;
   };
 
-  static cards = () =>
-    Cards.cardRanking().reduce((accum, card) => [accum[0] + 1, accum[1].setIn([card, "importance"], accum[0])], [
-      1,
-      Cards.rawCards()
-    ])[1];
+  static cards = (): CardMap => {
+    let result = Cards.rawCards();
+    Cards.cardRanking().forEach((card, i) => {
+      result = result.setIn([card, "importance"], i + 1) as CardMap;
+    });
+    return result;
+  };
 }
 export default Cards;

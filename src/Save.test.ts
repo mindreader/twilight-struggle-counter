@@ -1,8 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { fromJS } from "immutable";
-import { readFileSync } from "fs";
-import { resolve } from "path";
+import { readFileSync } from "node:fs";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import Cards from "./Cards";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 function loadSave(filename: string) {
   const raw = readFileSync(resolve(__dirname, "../saves", filename), "utf-8");
